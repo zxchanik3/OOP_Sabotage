@@ -17,7 +17,7 @@ namespace lab
 
         public int SectorsCount { get; set; }
 
-        public List<TrackSegment> Segments { get; set; } = new List<TrackSegment>();
+        public List<TrackSegment> Segments { get; set; } = new();
         
         public Track()
         {
@@ -60,7 +60,5 @@ namespace lab
             Segments.Add(new TrackSegment(SegmentType.Corner, 0.5, 0.4, 150.0, 0.05f)); // Поворот
             Segments.Add(new TrackSegment(SegmentType.Straight, 2.0, 1.0, 0, 0.01f));  // Пряма
         }
-        
-        ~Track() { }
     }
 }

@@ -50,7 +50,7 @@ namespace lab
                 Console.WriteLine("Гонка почалася!");
             }
             else
-                Console.WriteLine("Гонка вже має статус {0}", Status);
+                Console.WriteLine($"Гонка вже має статус {Status}");
         }
 
         public void FinishRace()
@@ -70,7 +70,7 @@ namespace lab
             }
             else
             {
-                Console.WriteLine("Гонка не була активною, статус: {Status}.");
+                Console.WriteLine($"Гонка не була активною, статус: {Status}.");
             }
         }
     }

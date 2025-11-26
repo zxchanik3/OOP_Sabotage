@@ -28,10 +28,5 @@ namespace lab
             MinSpeedLimit = minSpeedLimit;
             WearFactor = wearFactor;
         }
-        ~TrackSegment()
-        {
-            Console.WriteLine($"Об'єкт TrackSegment ({Type}) знищено.");
-        }
-        
     }
 }
