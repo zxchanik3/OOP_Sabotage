@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace lab
 {
@@ -14,12 +11,12 @@ namespace lab
         public List<Car> Cars { get; set; } = new List<Car>();
 
         public RaceStatus Status { get; set; }
-        public Dictionary<string, double> Results { get; set; }
+        public Dictionary<int, double> Results { get; set; }
 
         public Race()
         {
             Status = RaceStatus.NotStarted;
-            Results = new Dictionary<string, double>();
+            Results = new Dictionary<int, double>();
         }
 
         public Race(Track track) : this()
@@ -37,7 +34,7 @@ namespace lab
             Participants.Add(driver);
             Cars.Add(car);
 
-            Results.Add(driver.Name, 0.0);
+            Results.Add(driver.Number, 0.0);
 
             Console.WriteLine($"До гонки додано: {driver.Name} на {car.Model}");
         }
@@ -58,7 +55,7 @@ namespace lab
             if (Status == RaceStatus.Active)
             {
                 var random = new Random();
-                var keys = new List<string>(Results.Keys);
+                var keys = new List<int>(Results.Keys);
 
                 for (int i = 0; i < keys.Count; i++)
                 {

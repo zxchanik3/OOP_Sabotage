@@ -11,7 +11,7 @@ namespace lab
         public int Acceleration { get; set; }
         public int TopSpeed { get; set; }
         public int Weight { get; set; }
-        public int Speed { get; set; } = 0;
+        public int Speed { get; private set; } = 0;
         public Tyre Tyres { get; set; }
 
         private const float g = 9.81f;
@@ -35,8 +35,7 @@ namespace lab
             float v = Speed / 3.6f;
 
             float tyreCondition = MathF.Max(0.4f, Tyres.Durability / 100f);
-
-            // Прискорення та гальмування
+            
             v += Acceleration * accelInput * dt;
             v -= Acceleration * 1.5f * brakeInput * dt;
 
