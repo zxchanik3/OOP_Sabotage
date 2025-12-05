@@ -40,7 +40,7 @@ namespace lab
 
             if (driver.Lock)
             {
-                Console.WriteLine($"Cannot remove locked/default driver ({driver.Name}).");
+                Console.WriteLine($"Cannot remove locked driver ({driver.Name}).");
                 return;
             }
 
@@ -124,7 +124,7 @@ namespace lab
         public void RemoveTrack(string name)
         {
             var track = Tracks.FirstOrDefault(t => t.Name == name);
-            if(track == Null)
+            if (track == null)
             {
                 Console.WriteLine("Track cannot be deleted (not found)");
             }

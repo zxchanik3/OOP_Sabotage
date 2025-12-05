@@ -5,7 +5,7 @@ namespace lab
 {
     public class Car
     {
-        public string Model { get; set; }
+        public string Model { get; set; } = "Unknown";
         public string Team { get; set; } = "Independent";
         public int Year { get; set; }
 
@@ -19,7 +19,7 @@ namespace lab
         public Vector2 Position { get; set; } = new Vector2(0, 0);
         public Vector2 Direction { get; set; } = new Vector2(1, 0);
 
-        public Tyre Tyres { get; private set; }
+        public Tyre Tyres { get; private set; } 
 
         public Car() { }
 
