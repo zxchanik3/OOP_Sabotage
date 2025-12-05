@@ -22,6 +22,11 @@ namespace lab
             Lock = lockStatus;
         }
 
+        public void SetTeam(string team)
+        {
+            Team = team;
+        }
+
         public void AddRaceResult()
         {
             if (Position == 1) Wins++;
