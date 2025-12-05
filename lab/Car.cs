@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 
 namespace lab
 {
@@ -7,46 +8,44 @@ namespace lab
         public string Model { get; set; }
         public string Team { get; set; } = "Independent";
         public int Year { get; set; }
+        
         public int Horsepower { get; set; }
         public int Acceleration { get; set; }
         public int TopSpeed { get; set; }
         public int Weight { get; set; }
-        public int Speed { get; private set; } = 0;
-        public Tyre Tyres { get; set; }
-
-        private const float g = 9.81f;
-
+        
+        public float Speed { get; private set; } = 0f;
+        
         public Car() { }
+        
+        public Vector2 Position { get; set; } = new Vector2(0, 0);
+        public Vector2 Direction { get; set; } = new Vector2(1, 0);
 
-        ~Car() { }
-
-        public Car(string model, int year, int horsepower, Tyre tyre, int acceleration)
+        public Tyre Tyres { get; private set; }
+        
+        public Car(string model, string team, int year, int horsepower, int acceleration, int topSpeed, int weight)
         {
             Model = model;
             Year = year;
+            Team = team;
             Horsepower = horsepower;
             Acceleration = acceleration;
-
-            Tyres = new Tyre(tyre.Type, tyre.Durability, tyre.GripLevel, tyre.WearRate);
+            TopSpeed = topSpeed;
+            Weight = weight;
         }
 
-        public void PlayerControlSpeed(float accelInput, float brakeInput, float steerInput, float dt)
+        public void ChangeTyres(TyreType type)
         {
-            float v = Speed / 3.6f;
-
-            float tyreCondition = MathF.Max(0.4f, Tyres.Durability / 100f);
-            
-            v += Acceleration * accelInput * dt;
-            v -= Acceleration * 1.5f * brakeInput * dt;
-
-            float vmax = TopSpeed / 3.6f;
-            if (v > vmax) v = vmax;
-            if (v < 0) v = 0;
-
-            float turnPenalty = 1f - MathF.Abs(steerInput) * 0.3f * tyreCondition;
-            v *= turnPenalty;
-
-            Speed = (int)(v * 3.6f);
+            Tyres = new Tyre(type);
+        }
+        public void UpdateSpeed()
+        {
+            //ïîò³ì
+        }
+        
+        public void UpdateDirection(float angle)
+        {
+            //ïîò³ì
         }
     }
 }

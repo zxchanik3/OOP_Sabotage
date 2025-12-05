@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -10,11 +11,12 @@ namespace lab
     {
         public List<Driver> Drivers { get; private set; } = new();
         public List<Car> Cars { get; private set; } = new();
-        public List<Tyre> Tyres { get; private set; } = new();
-
+        public List<Track> Tracks { get; private set; } = new();
+        
+        public GameData() { }
+        
         public void AddDriver(Driver driver)
         {
-            // ��������, �� ����� ������
             if (Drivers.Any(d => d.Number == driver.Number))
             {
                 Console.WriteLine($"Номер {driver.Number} вже зайнятий.");
@@ -104,42 +106,42 @@ namespace lab
             Console.WriteLine("Дані завантажено.");
         }
 
-        public void AddTyre(Tyre tyre)
+        public void Addtrack(Track track)
         {
-            Tyres.Add(tyre);
-            Console.WriteLine($"Додано шину типу: {tyre.Type}");
+            Tracks.Add(track);
+            Console.WriteLine($"Додано трек: {track.Name}");
         }
 
-        public void RemoveTyre(string type)
+        public void RemoveTrack(string name)
         {
-            var tyre = Tyres.FirstOrDefault(t => t.Type == type);
-            if (tyre == null)
+            var track = Tracks.FirstOrDefault(t => t.Name == name);
+            if(track == null)
             {
-                Console.WriteLine("Шину такого типу не знайдено.");
+                Console.WriteLine("Трек не знайдено.");
                 return;
             }
-            Tyres.Remove(tyre);
-            Console.WriteLine($"Шину типу {tyre.Type} видалено.");
+            Tracks.Remove(track);
+            Console.WriteLine($"Трек {track.Name} видалено.");
         }
 
-        public void TyreSaveToFile(string path)
+        public void TrackSaveToFile(string path)
         {
-            string json = JsonSerializer.Serialize(Tyres, new JsonSerializerOptions { WriteIndented = true });
+            string json = JsonSerializer.Serialize(Tracks, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(path, json);
-            Console.WriteLine("Дані збережено.");
+            Console.WriteLine("Трек збережено.");
         }
 
-        public void TyreLoadFromFile(string path)
+        public void TrackLoadFromFile(string path)
         {
             if (!File.Exists(path))
             {
                 Console.WriteLine("Файл не знайдено.");
-                Tyres = new List<Tyre>();
+                Tracks = new List<Track>();
                 return;
             }
             string json = File.ReadAllText(path);
-            Tyres = JsonSerializer.Deserialize<List<Tyre>>(json) ?? new List<Tyre>();
-            Console.WriteLine("Дані завантажено.");
+            Tracks = JsonSerializer.Deserialize<List<Track>>(json) ?? new List<Track>();
+            Console.WriteLine("Трек завантажено.");
         }
     }
 }
