@@ -5,7 +5,7 @@ namespace lab
 {
     public class Car
     {
-        public string Model { get; set; }
+        public string Model { get; set; } = "Unknown";
         public string Team { get; set; } = "Independent";
         public int Year { get; set; }
         

@@ -4,7 +4,7 @@ namespace lab
 {
     public class Driver
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "Unknown";
         public int Number { get; set; }
         public string Team { get; set; } = "Independent";
         public int Wins { get; set; } = 0;
