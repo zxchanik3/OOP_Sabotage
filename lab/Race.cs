@@ -41,34 +41,46 @@ namespace lab
 
         public void StartRace()
         {
-            if (Status == RaceStatus.NotStarted)
+            Console.WriteLine($"\n--- Старт гонки на трасі {CurrentTrack.Name}! ---");
+            Console.WriteLine($"Дистанція: {CurrentTrack.RequiredLapCount} кіл.");
+            Status = RaceStatus.Active;
+            
+            for (int i = 0; i < Participants.Count; i++)
             {
-                Status = RaceStatus.Active;
-                Console.WriteLine("Гонка почалася!");
+                var driver = Participants[i];
+                var car = Cars[i];
+                double totalTime = 0;
+                double currentSpeed = 0;
+                
+                for (int lap = 1; lap <= CurrentTrack.RequiredLapCount; lap++)
+                {
+                    // Цикл по сегментах траси
+                    foreach (var segment in CurrentTrack.Segments)
+                    {
+                        // Ми передаємо currentSpeed як ref, щоб сегмент міг її змінити
+                        segment.ApplyEffect(car, ref currentSpeed);
+                        
+                        double speedForCalc = Math.Max(currentSpeed, 10.0); 
+                        double timeOnSegment = segment.Length / speedForCalc;
+                        
+                        totalTime += timeOnSegment;
+                    }
+                }
+
+                Results[driver.Number] = totalTime;
+                
+                // Оновлюємо статистику водія (код колеги)
+                driver.Races++;
+                // Тут можна додати логіку перемоги
             }
-            else
-                Console.WriteLine($"Гонка вже має статус {Status}");
+            
+            FinishRace();
         }
 
         public void FinishRace()
         {
-            if (Status == RaceStatus.Active)
-            {
-                var random = new Random();
-                var keys = new List<int>(Results.Keys);
-
-                for (int i = 0; i < keys.Count; i++)
-                {
-                    Results[keys[i]] = (random.NextDouble() * 30 + 60) * CurrentTrack.RequiredLapCount;
-                }
-
-                Status = RaceStatus.Finished;
-                Console.WriteLine("Гонка завершена. Результати зібрано.");
-            }
-            else
-            {
-                Console.WriteLine($"Гонка не була активною, статус: {Status}.");
-            }
+            Status = RaceStatus.Finished;
+            Console.WriteLine("Гонка завершена!");
         }
     }
 }
