@@ -106,7 +106,7 @@ namespace lab
             Console.WriteLine("Дані завантажено.");
         }
 
-        public void Addtrack(Track track)
+        public void AddTrack(Track track)
         {
             Tracks.Add(track);
             Console.WriteLine($"Додано трек: {track.Name}");
