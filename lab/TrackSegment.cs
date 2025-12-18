@@ -49,6 +49,7 @@ namespace lab
         public override void ApplyEffect(Car car, ref double currentSpeed)
         {
             // Обмеження швидкості в повороті залежить від шин
+            double grip = Math.Max(car.Tyres.GripLevel, 10);
             double gripFactor = car.Tyres.GripLevel / 100.0;
             
             double cornerLimit = (300 * gripFactor) / Difficulty; 
@@ -56,7 +57,6 @@ namespace lab
             if (currentSpeed > cornerLimit)
             {
                 currentSpeed = cornerLimit;
-                // Тут можна додати логіку сильного зносу шин через гальмування
                 car.Tyres.WearDown(); 
             }
             car.Tyres.WearDown();
@@ -71,8 +71,16 @@ namespace lab
         {
             if (currentSpeed > 80) currentSpeed = 80;
             
-            // Тут можна відновити шини (якщо реалізувати механіку піт-стопу)
-            // car.ChangeTyres(TyreType.Soft); // Приклад
+            if (car.Tyres.Durability < 40)
+            {
+                var oldType = car.Tyres.Type;
+                
+                car.ChangeTyres(TyreType.Soft);
+                
+                Console.WriteLine($"PIT-STOP {car.Model}: Заміна шин ({oldType} -> Soft).");
+                
+                currentSpeed = 5; 
+            }
         }
     }
     

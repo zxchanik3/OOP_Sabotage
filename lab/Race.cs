@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace lab
 {
@@ -7,11 +8,11 @@ namespace lab
     {
         public Track CurrentTrack { get; set; }
 
-        public List<Driver> Participants { get; set; } = new List<Driver>();
-        public List<Car> Cars { get; set; } = new List<Car>();
+        private List<Driver> Participants { get; set; } = new List<Driver>();
+        private List<Car> Cars { get; set; } = new List<Car>();
 
         public RaceStatus Status { get; set; }
-        public Dictionary<int, double> Results { get; set; }
+        public Dictionary<int, double> Results { get; private set; }
 
         public Race()
         {
@@ -34,7 +35,10 @@ namespace lab
             Participants.Add(driver);
             Cars.Add(car);
 
-            Results.Add(driver.Number, 0.0);
+            if (!Results.ContainsKey(driver.Number))
+            {
+                Results.Add(driver.Number, 0.0);
+            }
 
             Console.WriteLine($"До гонки додано: {driver.Name} на {car.Model}");
         }
@@ -68,10 +72,6 @@ namespace lab
                 }
 
                 Results[driver.Number] = totalTime;
-                
-                // Оновлюємо статистику водія (код колеги)
-                driver.Races++;
-                // Тут можна додати логіку перемоги
             }
             
             FinishRace();
@@ -80,7 +80,27 @@ namespace lab
         public void FinishRace()
         {
             Status = RaceStatus.Finished;
-            Console.WriteLine("Гонка завершена!");
+            Console.WriteLine("\n🏁 ГОНКА ЗАВЕРШЕНА! Підрахунок результатів...");
+            
+            var sortedResults = Results.OrderBy(x => x.Value).ToList();
+            
+            for (int i = 0; i < sortedResults.Count; i++)
+            {
+                int driverNum = sortedResults[i].Key;
+                var driver = Participants.Find(d => d.Number == driverNum);
+
+                if (driver != null)
+                {
+                    driver.Position = i + 1;
+                    driver.Races++;
+
+                    if (driver.Position == 1) 
+                        driver.Wins++;
+                    
+                    if (driver.Position <= 3) 
+                        driver.Podiums++;
+                }
+            }
         }
     }
 }
