@@ -24,7 +24,7 @@ public class Program
         game.AddDriver(driver3);
 
         // Створюємо боліди
-        var car1 = new Car("RB20", "Red Bull", 2024, 10, 20, 350, 798);
+        var car1 = new Car("RB20", "Red Bull", 2024, 1000, 20, 350, 798);
         var car2 = new Car("W15", "Mercedes", 2024, 980, 20, 340, 800);
         var car3 = new Car("SF-24", "Ferrari", 2024, 990, 20, 345, 798);
         

@@ -26,13 +26,5 @@ namespace lab
             double distance = Length * RequiredLapCount;
             return distance;
         }
-
-        public void DisplayTrackInfo()
-        {
-            Console.WriteLine($"Назва: {Name}");
-            Console.WriteLine($"Довжина кола: {Length} км");
-            Console.WriteLine($"Кількість кіл: {RequiredLapCount}");
-            Console.WriteLine($"Секторів: {SectorsCount}");
-        }
     }
 }

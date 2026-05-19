@@ -48,7 +48,7 @@ namespace lab
 
 		public void WearDown()
 		{
-			Durability -= (int)(10 * WearRate);
+			Durability -= (int)(10 * WearRate) / 5;
 			if (Durability < 0) Durability = 0;
 
 			if (Durability == 0)
