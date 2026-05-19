@@ -8,4 +8,3 @@ namespace lab
         public TrackSegment CurrentSegment { get; set; }
     }
 }
-

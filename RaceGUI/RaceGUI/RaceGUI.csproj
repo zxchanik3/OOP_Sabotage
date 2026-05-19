@@ -11,6 +11,27 @@
     <ItemGroup>
         <Resource Include="Images\WinterMap.jpg" />
         <Resource Include="Images\ForestMap.jpg" />
+        <None Remove="Images\SettingsButton.png" />
+        <Resource Include="Images\SettingsButton.png" />
+        <None Remove="Images\StartButton.png" />
+        <Resource Include="Images\StartButton.png" />
+        <None Remove="Images\StartScreen.png" />
+        <Resource Include="Images\StartScreen.png" />
+        <None Remove="Images\ChFMap.jpg" />
+        <Resource Include="Images\ChFMap.jpg" />
+        <None Remove="Images\ChWMap.jpg" />
+        <Resource Include="Images\ChWMap.jpg" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <None Remove="Music\MenuSong.mp3" />
+      <Content Include="Music\MenuSong.mp3">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Music\RaceSong.mp3" />
+      <Content Include="Music\RaceSong.mp3">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     
 </Project>
