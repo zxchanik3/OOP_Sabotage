@@ -1,0 +1,34 @@
+﻿<Window x:Class="RaceGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="F1 Manager 2025" Height="720" Width="1080"
+        KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#2C3E50">
+            <Button Name="BtnStart" Content="Старт Гонки" Width="120" Margin="10" Click="BtnStart_Click" Background="#27AE60" Foreground="White" FontWeight="Bold"/>
+            <Button Name="BtnStop" Content="Пауза" Width="100" Margin="0,10,10,10" Click="BtnStop_Click" Background="#E74C3C" Foreground="White" FontWeight="Bold"/>
+            
+            <ComboBox Name="TrackSelector" Width="150" Margin="0,10,10,10" VerticalContentAlignment="Center" SelectionChanged="TrackSelector_SelectionChanged">
+                <ComboBoxItem Content="Зимова траса (Winter GP)" IsSelected="True"/>
+                <ComboBoxItem Content="Лісова траса (Forest GP)"/>
+            </ComboBox>
+            
+            <TextBlock Name="TxtStatus" Text="Статус: Очікування" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0" FontSize="16"/>
+        </StackPanel>
+
+        <Canvas Name="GameCanvas" Grid.Row="1" MouseDown="GameCanvas_MouseDown">
+            <Canvas.Background>
+                <ImageBrush ImageSource="/Images/WinterMap.jpg" Stretch="Fill"/>
+            </Canvas.Background>
+            
+            <Rectangle Name="RectPitAreaDebug" Canvas.Left="350" Canvas.Top="470" Width="170" Height="50" Stroke="Red" StrokeThickness="2" Opacity="0.3" IsHitTestVisible="False"/>
+
+            <TextBlock Name="TxtPitStatus" Text="Йде обслуговування..." FontSize="28" Foreground="Yellow" FontWeight="Bold" Canvas.Left="390" Canvas.Top="630" Visibility="Collapsed"/>
+        </Canvas>
+    </Grid>
+</Window>
