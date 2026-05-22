@@ -49,15 +49,14 @@ namespace lab
         {
             if (Tyres == null || turnInput == 0) return;
 
-            float effectiveAngularVelocity = AngularVelocity * (Tyres.GripLevel / 100f);
-            float angleChange = effectiveAngularVelocity * turnInput * dT;
+            float effAngularVelocity = AngularVelocity * (Tyres.GripLevel / 100f);
+            float angleChange = effAngularVelocity * turnInput * dT;
             float angleRadians = MathF.PI / 180f * angleChange;
 
             Vector2 dir = Direction;
 
             float newX = dir.X * MathF.Cos(angleRadians) - dir.Y * MathF.Sin(angleRadians);
             float newY = dir.X * MathF.Sin(angleRadians) + dir.Y * MathF.Cos(angleRadians);
-
             Direction = Vector2.Normalize(new Vector2(newX, newY));
         }
 

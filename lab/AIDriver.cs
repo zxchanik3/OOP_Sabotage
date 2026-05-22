@@ -24,8 +24,7 @@ namespace lab
 
         public void SetStrategy(IDriveStrategy newStrategy)
         {
-            if (newStrategy != null)
-                strategy = newStrategy;
+            if (newStrategy != null) strategy = newStrategy;
         }
 
         public override void Drive(Car car, float dT)
@@ -33,17 +32,12 @@ namespace lab
             if (car == null || strategy == null) return;
             if (raceContext.CurrentSegment == null) return;
 
-            strategy.Drive(
-                car,
-                dT,
-                raceContext.TimeToOpponent,
-                raceContext.CurrentSegment
-            );
+            strategy.Drive(car, dT, raceContext.TimeToOpponent, raceContext.CurrentSegment);
         }
 
         public void UpdateContext(RaceContext context)
         {
-            raceContext = context;
+            if (context != null) raceContext = context;
         }
     }
 

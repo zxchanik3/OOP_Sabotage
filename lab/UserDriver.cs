@@ -22,18 +22,6 @@ namespace lab
                 buttonState[b] = false;
         }
 
-        public void Press(Button button)
-        {
-            if (buttonState.ContainsKey(button))
-                buttonState[button] = true;
-        }
-
-        public void Release(Button button)
-        {
-            if (buttonState.ContainsKey(button))
-                buttonState[button] = false;
-        }
-
         public override void Drive(Car car, float dT)
         {
             if (car == null) return;

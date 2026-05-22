@@ -7,17 +7,15 @@ namespace lab
         public string Name { get; set; } = "Unknown";
         public int Number { get; set; }
         public string Team { get; set; } = "Independent";
-
         public int Wins { get; set; }
         public int Races { get; set; }
         public int Podiums { get; set; }
         public int Position { get; set; }
-
         public bool Lock { get; protected set; }
 
-        protected Driver() { }
+        public Driver() { }
 
-        protected Driver(string name, int number, bool lockStatus)
+        public Driver(string name, int number, bool lockStatus)
         {
             Name = name;
             Number = number;
