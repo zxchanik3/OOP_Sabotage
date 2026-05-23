@@ -9,19 +9,26 @@ namespace lab
         public string Team { get; set; } = "Independent";
         public int Year { get; set; }
         public int Horsepower { get; set; }
-        public int Acceleration { get; set; }
+        public int Acceleration { get; set; } // Твій тип даних
         public int TopSpeed { get; set; }
         public int Weight { get; set; }
+        
+        // ФІЧА КОЛЕГИ: Шлях до картинки для Гаража
+        public string ImagePath { get; set; } = ""; 
+
         public float SpeedScale { get; set; } = 0.4f;
 
-        public float Speed { get; private set; } = 0f;
+        // ТВІЙ КОД: Speed має { get; set; } для роботи рестарту гри
+        public float Speed { get; set; } = 0f; 
+        
         public Vector2 Position { get; private set; } = new Vector2(0, 0);
         public Vector2 Direction { get; private set; } = new Vector2(1, 0);
         private float AngularVelocity { get; set; } = 90f;
         public Tyre Tyres { get; private set; }
         public float MaxReverseSpeed { get; set; } = 40f;
 
-        public Car(string model, string team, int year, int horsepower, int acceleration, int topSpeed, int weight)
+        // ОНОВЛЕНИЙ КОНСТРУКТОР: Твої типи даних + ImagePath від колеги
+        public Car(string model, string team, int year, int horsepower, int acceleration, int topSpeed, int weight, string imagePath = "")
         {
             Model = model;
             Year = year;
@@ -30,6 +37,7 @@ namespace lab
             Acceleration = acceleration;
             TopSpeed = topSpeed;
             Weight = weight;
+            ImagePath = imagePath;
             Tyres = new Tyre(TyreType.Medium);
         }
 
@@ -75,18 +83,13 @@ namespace lab
         public void UpdateDirection(float dT, float turnInput)
         {
             float absoluteSpeed = MathF.Abs(Speed);
-            // Ìàøèíêà ïî÷èíàº ïîâåðòàòè íàâ³òü ç ì³í³ìàëüíîãî ðóõó (çíèçèëè ë³ì³ò ç 1f äî 0.1f)
             if (Tyres == null || turnInput == 0 || absoluteSpeed < 0.1f) return;
 
             float gripFactor = Tyres.GripLevel / 100f;
 
-            // ÇÁ²ËÜØÅÍÀ ÁÀÇÎÂÀ ØÂÈÄÊ²ÑÒÜ ÏÎÂÎÐÎÒÓ: çì³íåíî ç 90f íà 150f äëÿ á³ëüøî¿ ð³çêîñò³
-            float baseAngularVelocity = 90f;
-
-            // ÏÎÌ'ßÊØÅÍÈÉ ÊÎÅÔ²Ö²ªÍÒ ØÂÈÄÊ²ÑÒ²: çì³íåíî ç 180f íà 300f.
-            // Òåïåð íà øâèäêîñò³ 150 êì/ãîä øâèäê³ñòü ïîâîðîòó çìåíøèòüñÿ ëèøå íà 33% (áóäå 0.66),
-            // à íå âäâ³÷³, ÿê ðàí³øå. Ìàøèíêà áóäå çàõîäèòè â ïîâîðîòè çíà÷íî æâàâ³øå.
-            float speedSensitivityFactor = 1f / (1f + absoluteSpeed / 200f);
+            // ТВОЯ ФІЗИКА: Машина повертає швидше і краще тримає керування
+            float baseAngularVelocity = 150f;
+            float speedSensitivityFactor = 1f / (1f + absoluteSpeed / 300f);
 
             float effectiveAngularVelocity = baseAngularVelocity * gripFactor * speedSensitivityFactor;
             float angleChange = effectiveAngularVelocity * turnInput * dT;
@@ -104,6 +107,7 @@ namespace lab
 
             Direction = Vector2.Normalize(new Vector2(newX, newY));
         }
+        
         public void SetPosition(Vector2 newPos, Vector2 startDirection)
         {
             Position = newPos;

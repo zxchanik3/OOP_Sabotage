@@ -5,7 +5,7 @@ namespace lab
     public class TrackNode
     {
         public Vector2 Position { get; }
-        public TrackSegment Logic { get; }
+        public TrackSegment Logic { get; set; }
 
         public TrackNode(Vector2 position, TrackSegment logic)
         {

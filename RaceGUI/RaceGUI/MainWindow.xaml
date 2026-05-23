@@ -17,6 +17,14 @@
                 </Button.Template>
             </Button>
 
+            <Button Name="BtnCarGarage" Width="130" Height="60" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,442,0,0" Click="BtnCarGarage_Click" Cursor="Hand" Background="Transparent" BorderBrush="Transparent">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Image Source="/Images/CarButton.png" Stretch="Uniform"/>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
             <Button Name="BtnPlayGame" Width="130" Height="130" HorizontalAlignment="Center" VerticalAlignment="Center" Click="BtnPlayGame_Click" Cursor="Hand" Background="Transparent" BorderBrush="Transparent">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
@@ -31,7 +39,7 @@
                         <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="3"/>
                     </TextBlock.Effect>
                 </TextBlock>
-                
+
                 <StackPanel Orientation="Horizontal">
                     <Button Name="BtnMapWinter" Width="300" Height="300" Margin="20" Click="BtnMapWinter_Click" Cursor="Hand" Background="Transparent" BorderBrush="Transparent">
                         <Button.Template>
@@ -40,7 +48,7 @@
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
-                    
+
                     <Button Name="BtnMapForest" Width="300" Height="300" Margin="20" Click="BtnMapForest_Click" Cursor="Hand" Background="Transparent" BorderBrush="Transparent">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
@@ -51,18 +59,32 @@
                 </StackPanel>
             </StackPanel>
 
-            <Border Name="SettingsPanel" Visibility="Collapsed" Background="#F22C3E50" Width="360" Height="260" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="10">
-                <StackPanel Margin="25">
-                    <TextBlock Text="НАЛАШТУВАННЯ ТРАСИ" Foreground="White" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,20"/>
-                    <TextBlock Text="Кількість кіл:" Foreground="White" FontWeight="Bold" Margin="0,0,0,5"/>
-                    <ComboBox Name="ComboLaps" SelectedIndex="1" Margin="0,0,0,20">
-                        <ComboBoxItem Content="3 кола (Спринт)"/>
-                        <ComboBoxItem Content="5 кіл (Стандартна гонка)"/>
-                        <ComboBoxItem Content="15 кіл (Повна дистанція)"/>
-                    </ComboBox>
-                    <CheckBox Name="CheckAutoPit" Content="Авто-лімітатор швидкості на піт-лейн" IsChecked="True" Foreground="White" FontWeight="Bold" Margin="0,0,0,25"/>
-                    <Button Content="Зберегти налаштування" Click="BtnCloseSettings_Click" Width="180" Padding="8" Background="#27AE60" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
-                </StackPanel>
+            <Border Name="SettingsPanel" Visibility="Collapsed" Background="#80000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="101">
+                <Border Background="#9E9E9E" Width="455" Height="320" CornerRadius="15" BorderBrush="#555555" BorderThickness="4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        
+                        <Border Background="#D32F2F" CornerRadius="15" Width="240" Height="45" Margin="0,0,0,20" BorderBrush="#555555" BorderThickness="2">
+                            <TextBlock Text="НАЛАШТУВАННЯ ТРАСИ" Foreground="White" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+
+                        <TextBlock Text="Кількість кіл:" Foreground="#2C3E50" FontWeight="Bold" FontSize="14" Margin="0,0,0,5" HorizontalAlignment="Left"/>
+                        <ComboBox Name="ComboLaps" SelectedIndex="1" Margin="0,0,0,15" Width="380" Height="32" FontSize="14" VerticalContentAlignment="Center">
+                            <ComboBoxItem Content="3 кола (Спринт)"/>
+                            <ComboBoxItem Content="5 кіл (Стандартна гонка)"/>
+                            <ComboBoxItem Content="15 кіл (Повна дистанція)"/>
+                        </ComboBox>
+                        
+                        <CheckBox Name="CheckAutoPit" Content="Авто-лімітатор швидкості на піт-лейн" IsChecked="True" Foreground="#2C3E50" FontWeight="Bold" FontSize="14" Margin="0,0,0,25" HorizontalAlignment="Left"/>
+
+                        <Button Content="Зберегти налаштування" Width="260" Height="45" Background="#E0E0E0" Foreground="#2C3E50" FontWeight="Bold" FontSize="16" Click="BtnCloseSettings_Click">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="20"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </StackPanel>
+                </Border>
             </Border>
         </Grid>
 
@@ -73,8 +95,6 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#2C3E50">
-                <Button Name="BtnStart" Content="Старт Гонки" Width="120" Margin="10" Click="BtnStart_Click" Background="#27AE60" Foreground="White" FontWeight="Bold"/>
-                <Button Name="BtnStop" Content="Пауза" Width="100" Margin="0,10,10,10" Click="BtnStop_Click" Background="#E74C3C" Foreground="White" FontWeight="Bold"/>
                 <TextBlock Name="TxtStatus" Text="Статус: Очікування" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0" FontSize="16"/>
             </StackPanel>
 
@@ -82,9 +102,49 @@
                 <Canvas.Background>
                     <ImageBrush ImageSource="/Images/WinterMap.jpg" Stretch="Fill"/>
                 </Canvas.Background>
-                
+
                 <TextBlock Name="TxtPitStatus" Text="Йде обслуговування..." FontSize="28" Foreground="Yellow" FontWeight="Bold" Canvas.Left="390" Canvas.Top="630" Visibility="Collapsed"/>
             </Canvas>
+
+            <Border Name="PauseMenuPanel" Visibility="Collapsed" Background="#80000000" Grid.Row="1" Panel.ZIndex="100">
+                <Border Background="#9E9E9E" Width="455" Height="290" CornerRadius="15" BorderBrush="#555555" BorderThickness="4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Background="#D32F2F" CornerRadius="15" Width="180" Height="45" Margin="0,0,0,25" BorderBrush="#555555" BorderThickness="2">
+                            <TextBlock Text="ПАУЗА" Foreground="White" FontWeight="Bold" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+
+                        <Button Name="BtnRestart" Content="Перезапустити" Width="260" Height="45" Margin="0,0,0,15" Background="#E0E0E0" FontWeight="Bold" FontSize="18" Click="BtnRestart_Click">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="20"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+
+                        <Button Name="BtnMainMenu" Content="Головне меню" Width="260" Height="45" Background="#E0E0E0" FontWeight="Bold" FontSize="18" Click="BtnMainMenu_Click">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="20"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Border>
         </Grid>
+
+        <Border Name="CarGaragePanel" Visibility="Collapsed" Background="#F22C3E50" Width="360" Height="260" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="10">
+            <StackPanel Margin="25">
+                <TextBlock Text="ВИБІР МАШИНИ" Foreground="White" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                <Image Name="CarPreviewImage" Width="250" Height="120" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="◀" Width="60" Margin="5" Click="BtnPrevCar_Click" Background="#27AE60" Foreground="White" FontWeight="Bold"/>
+                    <Button Content="Вибрати" Width="120" Margin="5" Click="BtnSelectCar_Click" Background="#2980B9" Foreground="White" FontWeight="Bold"/>
+                    <Button Content="▶" Width="60" Margin="5" Click="BtnNextCar_Click" Background="#27AE60" Foreground="White" FontWeight="Bold"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
