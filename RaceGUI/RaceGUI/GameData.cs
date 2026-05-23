@@ -16,23 +16,55 @@ namespace lab
         public int TopSpeed { get; set; }
         public int Weight { get; set; }
         public string ImagePath { get; set; } = "";
+
+        public CarConfig(string model, string team, int year, int horsepower, float acceleration, int topSpeed, int weight, string imagePath)
+        {
+            Model = model;
+            Team = team;
+            Year = year;
+            Horsepower = horsepower;
+            Acceleration = acceleration;
+            TopSpeed = topSpeed;
+            Weight = weight;
+            ImagePath = imagePath;
+        }
     }
     public class DriverConfig
-    {
+        {
         public string Name { get; set; } = "";
         public int Number { get; set; }
         public bool Lock { get; set; }
+
+        public DriverConfig(string name, int number, bool lockStatus)
+        {
+            Name = name;
+            Number = number;
+            Lock = lockStatus;
+        }
     }
     public class TrackNodeConfig
     {
         public float X { get; set; }
         public float Y { get; set; }
+
+        public TrackNodeConfig(float x, float y)
+        {
+            X = x;
+            Y = y;
+        }
     }
     public class TrackConfig
     {
         public string Name { get; set; } = "";
         public int Laps { get; set; }
         public List<TrackNodeConfig> Nodes { get; set; } = new();
+
+        public TrackConfig(string name, int laps, List<TrackNodeConfig> nodes)
+        {
+            Name = name;
+            Laps = laps;
+            Nodes = nodes;
+        }
     }
     public class GameData
     {

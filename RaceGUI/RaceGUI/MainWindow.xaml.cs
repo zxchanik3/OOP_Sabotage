@@ -1,6 +1,7 @@
 ﻿using lab;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Windows;
@@ -17,6 +18,7 @@ namespace RaceGUI
     {
         // ================= DATA =================
         private GameData _gameData = new();
+        private readonly string _dataFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
 
         private List<Car> _cars = new();
         private Dictionary<Car, Image> _carVisuals = new();
@@ -56,113 +58,30 @@ namespace RaceGUI
 
         private void InitializeGame()
         {
-            Car car1 = new Car("Car1", "Blue", 2020, 670, 3, 250, 780, "Images/car1.png");
-            Car car2 = new Car("Car2", "Green", 2021, 720, 2, 260, 750, "Images/car2.png");
-            Car car3 = new Car("Car3", "Purple", 2019, 650, 4, 240, 800, "Images/car3.png");
-            Car car4 = new Car("Car4", "Yellow", 2022, 700, 3.5f, 255, 770, "Images/car4.png");
-            Car car5 = new Car("Car5", "Red", 2023, 750, 2.5f, 270, 730, "Images/car5.png");
-            Car car6 = new Car("Car6", "Orange", 2020, 680, 3.2f, 245, 790, "Images/car6.png");
-            Car car7 = new Car("Car7", "Cyan", 2021, 710, 2.8f, 265, 760, "Images/car7.png");
+            Directory.CreateDirectory(_dataFolder);
+            _gameData.AddCar(new CarConfig("Car1", "Blue", 2020, 670, 3, 250, 780, "Images/car1.png"));
+            _gameData.AddCar(new CarConfig("Car2", "Green", 2021, 720, 2, 260, 750, "Images/car2.png"));
+            _gameData.AddCar(new CarConfig("Car3", "Purple", 2019, 650, 4, 240, 800, "Images/car3.png"));
+            _gameData.AddCar(new CarConfig("Car4", "Yellow", 2022, 700, 3.5f, 255, 770, "Images/car4.png"));
+            _gameData.AddCar(new CarConfig("Car5", "Red", 2023, 750, 2.5f, 270, 730, "Images/car5.png"));
+            _gameData.AddCar(new CarConfig("Car6", "Orange", 2020, 680, 3.2f, 245, 790, "Images/car6.png"));
+            _gameData.AddCar(new CarConfig("Car7", "Cyan", 2021, 710, 2.8f, 265, 760, "Images/car7.png"));
 
-            _gameData.Cars.AddRange(new[]
-            {
-                new CarConfig
-                {
-                    Model = car1.Model,
-                    Team = car1.Team,
-                    Year = car1.Year,
-                    Horsepower = car1.Horsepower,
-                    Acceleration = car1.Acceleration,
-                    TopSpeed = car1.TopSpeed,
-                    Weight = car1.Weight,
-                    ImagePath = car1.ImagePath
-                },
-                new CarConfig
-                {
-                    Model = car2.Model,
-                    Team = car2.Team,
-                    Year = car2.Year,
-                    Horsepower = car2.Horsepower,
-                    Acceleration = car2.Acceleration,
-                    TopSpeed = car2.TopSpeed,
-                    Weight = car2.Weight,
-                    ImagePath = car2.ImagePath
-                },
-                new CarConfig
-                {
-                    Model = car3.Model,
-                    Team = car3.Team,
-                    Year = car3.Year,
-                    Horsepower = car3.Horsepower,
-                    Acceleration = car3.Acceleration,
-                    TopSpeed = car3.TopSpeed,
-                    Weight = car3.Weight,
-                    ImagePath = car3.ImagePath
-                },
-                new CarConfig
-                {
-                    Model = car4.Model,
-                    Team = car4.Team,
-                    Year = car4.Year,
-                    Horsepower = car4.Horsepower,
-                    Acceleration = car4.Acceleration,
-                    TopSpeed = car4.TopSpeed,
-                    Weight = car4.Weight,
-                    ImagePath = car4.ImagePath
-                },
-                new CarConfig
-                {
-                    Model = car5.Model,
-                    Team = car5.Team,
-                    Year = car5.Year,
-                    Horsepower = car5.Horsepower,
-                    Acceleration = car5.Acceleration,
-                    TopSpeed = car5.TopSpeed,
-                    Weight = car5.Weight,
-                    ImagePath = car5.ImagePath
-                },
-                new CarConfig
-                {
-                    Model = car6.Model,
-                    Team = car6.Team,
-                    Year = car6.Year,
-                    Horsepower = car6.Horsepower,
-                    Acceleration = car6.Acceleration,
-                    TopSpeed = car6.TopSpeed,
-                    Weight = car6.Weight,
-                    ImagePath = car6.ImagePath
-                },
-                new CarConfig
-                {
-                    Model = car7.Model,
-                    Team = car7.Team,
-                    Year = car7.Year,
-                    Horsepower = car7.Horsepower,
-                    Acceleration = car7.Acceleration,
-                    TopSpeed = car7.TopSpeed,
-                    Weight = car7.Weight,
-                    ImagePath = car7.ImagePath
-                }
-            });
+            _gameData.AddDriver(new DriverConfig("Player", 77, false));
+            _gameData.AddDriver(new DriverConfig("Lewis", 11, true));
+            _gameData.AddDriver(new DriverConfig("Kimi", 22, true));
+            _gameData.AddDriver(new DriverConfig("Max", 33, true));
+            _gameData.AddDriver(new DriverConfig("Toto", 44, true));
+            _gameData.AddDriver(new DriverConfig("Nico", 55, true));
+            _gameData.AddDriver(new DriverConfig("George", 66, true));
 
-            _gameData.Drivers.AddRange(new[]
-            {
-                new DriverConfig { Name = "Player", Number = 77, Lock = false },
-                new DriverConfig { Name = "Lewis", Number = 11, Lock = true },
-                new DriverConfig { Name = "Kimi", Number = 22, Lock = true },
-                new DriverConfig { Name = "Max", Number = 33, Lock = true },
-                new DriverConfig { Name = "Toto", Number = 44, Lock = true },
-                new DriverConfig { Name = "Nico", Number = 55, Lock = true },
-                new DriverConfig { Name = "George", Number = 66, Lock = true }
-            });
-            
 
-            _gameData.CarSaveToFile("CarsData.json");
-            _gameData.DriverSaveToFile("DriversData.json");
-            _gameData.TrackSaveToFile("TracksData.json");
 
-            _gameData.CarLoadFromFile("CarsData.json");
-            _gameData.TrackLoadFromFile("TracksData.json");
+            _gameData.CarSaveToFile(System.IO.Path.Combine(_dataFolder, "CarsData.json")); 
+            _gameData.DriverSaveToFile(System.IO.Path.Combine(_dataFolder, "DriversData.json"));
+
+            _gameData.CarLoadFromFile(System.IO.Path.Combine(_dataFolder, "CarsData.json"));
+            _gameData.TrackLoadFromFile(System.IO.Path.Combine(_dataFolder, "TracksData.json"));
 
             _carOptions = _gameData.Cars
                 .Select(c => new Car(
@@ -407,26 +326,40 @@ namespace RaceGUI
         private void BtnNextCar_Click(object sender, RoutedEventArgs e)
         {
             if (_carOptions.Count == 0) return;
-            _carIndex = (_carIndex + 1) % _carOptions.Count;
+
+            // Збільшуємо індекс. Якщо дійшли до кінця — скидаємо на 0 (циклічне перемикання)
+            _carIndex++;
+            if (_carIndex >= _carOptions.Count)
+            {
+                _carIndex = 0;
+            }
+
             UpdateCarPreview();
         }
 
         private void BtnPrevCar_Click(object sender, RoutedEventArgs e)
         {
             if (_carOptions.Count == 0) return;
+
             _carIndex--;
-            if (_carIndex < 0) _carIndex = _carOptions.Count - 1;
+            if (_carIndex < 0)
+            {
+                _carIndex = _carOptions.Count - 1;
+            }
+
             UpdateCarPreview();
         }
 
         private void BtnSelectCar_Click(object sender, RoutedEventArgs e)
         {
-            if (_carOptions.Count == 0) return;
-            _selectedCarTemplate = _carOptions[_carIndex];
-            TxtStatus.Text = $"Selected: {_selectedCarTemplate.Model}";
-            CarGaragePanel.Visibility = Visibility.Collapsed;
-        }
+            if (_carOptions.Count > 0)
+            {
+                _selectedCarTemplate = _carOptions[_carIndex];
 
+                CarGaragePanel.Visibility = Visibility.Collapsed;
+            }
+        }
+        
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.C && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
@@ -508,18 +441,18 @@ namespace RaceGUI
 
         private void UpdateCarPreview()
         {
-            if (_carOptions.Count == 0) return;
+            if (_carOptions.Count == 0 || _carIndex < 0 || _carIndex >= _carOptions.Count) return;
 
             string path = _carOptions[_carIndex].ImagePath ?? string.Empty;
+
             try
             {
-                CarPreviewImage.Source = new BitmapImage(new Uri(path, UriKind.RelativeOrAbsolute));
+                CarPreviewImage.Source = new BitmapImage(new Uri(path, UriKind.Relative));
             }
-            catch
+            catch (Exception ex)
             {
-                CarPreviewImage.Source = null;
+                System.Diagnostics.Debug.WriteLine($"Помилка завантаження ресурсу: {ex.Message}");
             }
         }
-
     }
 }
