@@ -9,11 +9,12 @@ namespace lab
         public string Team { get; set; } = "Independent";
         public int Year { get; set; }
         public int Horsepower { get; set; }
-        public int Acceleration { get; set; }
+        public float Acceleration { get; set; }
         public int TopSpeed { get; set; }
         public int Weight { get; set; }
-        public float SpeedScale { get; set; } = 0.4f;
+        public string ImagePath { get; set; } = "";
 
+        public float SpeedScale { get; set; } = 0.4f;
         public float Speed { get; private set; } = 0f;
         public Vector2 Position { get; private set; } = new Vector2(0, 0);
         public Vector2 Direction { get; private set; } = new Vector2(1, 0);
@@ -21,7 +22,7 @@ namespace lab
         public Tyre Tyres { get; private set; }
         public float MaxReverseSpeed { get; set; } = 40f;
 
-        public Car(string model, string team, int year, int horsepower, int acceleration, int topSpeed, int weight)
+        public Car(string model, string team, int year, int horsepower, float acceleration, int topSpeed, int weight, string imagePath)
         {
             Model = model;
             Year = year;
@@ -31,6 +32,7 @@ namespace lab
             TopSpeed = topSpeed;
             Weight = weight;
             Tyres = new Tyre(TyreType.Medium);
+            ImagePath = imagePath;
         }
 
         public void ChangeTyres(TyreType type)
@@ -75,17 +77,12 @@ namespace lab
         public void UpdateDirection(float dT, float turnInput)
         {
             float absoluteSpeed = MathF.Abs(Speed);
-            // Машинка починає повертати навіть з мінімального руху (знизили ліміт з 1f до 0.1f)
             if (Tyres == null || turnInput == 0 || absoluteSpeed < 0.1f) return;
 
             float gripFactor = Tyres.GripLevel / 100f;
 
-            // ЗБІЛЬШЕНА БАЗОВА ШВИДКІСТЬ ПОВОРОТУ: змінено з 90f на 150f для більшої різкості
             float baseAngularVelocity = 90f;
 
-            // ПОМ'ЯКШЕНИЙ КОЕФІЦІЄНТ ШВИДКІСТІ: змінено з 180f на 300f.
-            // Тепер на швидкості 150 км/год швидкість повороту зменшиться лише на 33% (буде 0.66),
-            // а не вдвічі, як раніше. Машинка буде заходити в повороти значно жвавіше.
             float speedSensitivityFactor = 1f / (1f + absoluteSpeed / 200f);
 
             float effectiveAngularVelocity = baseAngularVelocity * gripFactor * speedSensitivityFactor;
@@ -104,6 +101,7 @@ namespace lab
 
             Direction = Vector2.Normalize(new Vector2(newX, newY));
         }
+        
         public void SetPosition(Vector2 newPos, Vector2 startDirection)
         {
             Position = newPos;

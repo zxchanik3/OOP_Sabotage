@@ -9,8 +9,14 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <Resource Include="Images\car1.png">
+          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </Resource>
         <Resource Include="Images\WinterMap.jpg" />
         <Resource Include="Images\ForestMap.jpg" />
+        <None Remove="Images\blueCar.png" />
+        <None Remove="Images\car1.png" />
+        <None Remove="Images\CarButton.png" />
         <None Remove="Images\SettingsButton.png" />
         <Resource Include="Images\SettingsButton.png" />
         <None Remove="Images\StartButton.png" />
@@ -29,6 +35,9 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <None Remove="Music\RaceSong.mp3" />
+      <Resource Include="Images\CarButton.png">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Resource>
       <Content Include="Music\RaceSong.mp3">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>

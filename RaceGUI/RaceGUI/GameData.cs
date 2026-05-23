@@ -1,21 +1,50 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
 namespace lab
 {
+    public class CarConfig
+    {
+        public string Model { get; set; } = "";
+        public string Team { get; set; } = "";
+        public int Year { get; set; }
+        public int Horsepower { get; set; }
+        public float Acceleration { get; set; }
+        public int TopSpeed { get; set; }
+        public int Weight { get; set; }
+        public string ImagePath { get; set; } = "";
+    }
+    public class DriverConfig
+    {
+        public string Name { get; set; } = "";
+        public int Number { get; set; }
+        public bool Lock { get; set; }
+    }
+    public class TrackNodeConfig
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+    }
+    public class TrackConfig
+    {
+        public string Name { get; set; } = "";
+        public int Laps { get; set; }
+        public List<TrackNodeConfig> Nodes { get; set; } = new();
+    }
     public class GameData
     {
-        public List<Driver> Drivers { get; private set; } = new();
-        public List<Car> Cars { get; private set; } = new();
-        public List<Track> Tracks { get; private set; } = new();
-        
+        public List<DriverConfig> Drivers { get; private set; } = new();
+        public List<CarConfig> Cars { get; private set; } = new();
+        public List<TrackConfig> Tracks { get; private set; } = new();
+
         public GameData() { }
-        
-        public void AddDriver(Driver driver)
+
+        #region Drivers
+
+        public void AddDriver(DriverConfig driver)
         {
             if (Drivers.Any(d => d.Number == driver.Number))
             {
@@ -49,26 +78,19 @@ namespace lab
 
         public void DriverSaveToFile(string path)
         {
-            string json = JsonSerializer.Serialize(Drivers, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(path, json);
-            Console.WriteLine("Дані збережено.");
+            Save(Drivers, path);
         }
 
         public void DriverLoadFromFile(string path)
         {
-            if (!File.Exists(path))
-            {
-                Console.WriteLine("Файл не знайдено.");
-                Drivers = new List<Driver>();
-                return;
-            }
-
-            string json = File.ReadAllText(path);
-            Drivers = JsonSerializer.Deserialize<List<Driver>>(json) ?? new List<Driver>();
-            Console.WriteLine("Дані завантажено.");
+            Drivers = Load<List<DriverConfig>>(path) ?? new();
         }
 
-        public void AddCar(Car car)
+        #endregion
+
+        #region Cars
+
+        public void AddCar(CarConfig car)
         {
             Cars.Add(car);
             Console.WriteLine($"Додано автомобіль: {car.Model}");
@@ -79,34 +101,28 @@ namespace lab
             var car = Cars.FirstOrDefault(c => c.Model == model);
             if (car == null)
             {
-                Console.WriteLine("Автомобіль з такою моделлю не знайдено.");
+                Console.WriteLine("Автомобіль не знайдено.");
                 return;
             }
+
             Cars.Remove(car);
-            Console.WriteLine($"Автомобіль {car.Model} видалено.");
         }
 
         public void CarSaveToFile(string path)
         {
-            string json = JsonSerializer.Serialize(Cars, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(path, json);
-            Console.WriteLine("Дані збережено.");
+            Save(Cars, path);
         }
 
         public void CarLoadFromFile(string path)
         {
-            if (!File.Exists(path))
-            {
-                Console.WriteLine("Файл не знайдено.");
-                Cars = new List<Car>();
-                return;
-            }
-            string json = File.ReadAllText(path);
-            Cars = JsonSerializer.Deserialize<List<Car>>(json) ?? new List<Car>();
-            Console.WriteLine("Дані завантажено.");
+            Cars = Load<List<CarConfig>>(path) ?? new();
         }
 
-        public void AddTrack(Track track)
+        #endregion
+
+        #region Tracks
+
+        public void AddTrack(TrackConfig track)
         {
             Tracks.Add(track);
             Console.WriteLine($"Додано трек: {track.Name}");
@@ -115,33 +131,49 @@ namespace lab
         public void RemoveTrack(string name)
         {
             var track = Tracks.FirstOrDefault(t => t.Name == name);
-            if(track == null)
+            if (track == null)
             {
                 Console.WriteLine("Трек не знайдено.");
                 return;
             }
+
             Tracks.Remove(track);
-            Console.WriteLine($"Трек {track.Name} видалено.");
         }
 
         public void TrackSaveToFile(string path)
         {
-            string json = JsonSerializer.Serialize(Tracks, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(path, json);
-            Console.WriteLine("Трек збережено.");
+            Save(Tracks, path);
         }
 
         public void TrackLoadFromFile(string path)
         {
-            if (!File.Exists(path))
-            {
-                Console.WriteLine("Файл не знайдено.");
-                Tracks = new List<Track>();
-                return;
-            }
-            string json = File.ReadAllText(path);
-            Tracks = JsonSerializer.Deserialize<List<Track>>(json) ?? new List<Track>();
-            Console.WriteLine("Трек завантажено.");
+            Tracks = Load<List<TrackConfig>>(path) ?? new();
         }
+
+        #endregion
+
+        #region Generic JSON
+
+        private void Save<T>(T data, string path)
+        {
+            string json = JsonSerializer.Serialize(data, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            File.WriteAllText(path, json);
+        }
+
+        private T? Load<T>(string path)
+        {
+            if (!File.Exists(path))
+                return default;
+
+            string json = File.ReadAllText(path);
+            return JsonSerializer.Deserialize<T>(json);
+        }
+
+        #endregion
     }
+
 }

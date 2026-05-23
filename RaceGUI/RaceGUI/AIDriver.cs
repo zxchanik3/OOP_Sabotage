@@ -14,9 +14,7 @@ namespace lab
         );
     }
 
-    // =========================
-    // NPC DRIVER (без змін фізики)
-    // =========================
+
     public class NPCDriver : Driver
     {
         private IDriveStrategy strategy;
@@ -57,9 +55,6 @@ namespace lab
         }
     }
 
-    // =========================
-    // BASE WAYPOINT STRATEGY
-    // =========================
     public class BaseWaypointStrategy : IDriveStrategy
     {
         protected List<Vector2> _waypoints;
@@ -120,9 +115,6 @@ namespace lab
         }
     }
 
-    // =========================
-    // ATTACK STRATEGY
-    // =========================
     public class AttackStrategy : BaseWaypointStrategy
     {
         public AttackStrategy(List<Vector2> waypoints, int startIndex = 1)
@@ -158,9 +150,6 @@ namespace lab
         }
     }
 
-    // =========================
-    // NORMAL STRATEGY
-    // =========================
     public class NormalStrategy : BaseWaypointStrategy
     {
         public NormalStrategy(List<Vector2> waypoints, int startIndex = 1)
@@ -171,9 +160,6 @@ namespace lab
         }
     }
 
-    // =========================
-    // DEFENSE STRATEGY
-    // =========================
     public class DefenseStrategy : BaseWaypointStrategy
     {
         public DefenseStrategy(List<Vector2> waypoints, int startIndex = 1)

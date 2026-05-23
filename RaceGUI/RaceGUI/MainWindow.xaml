@@ -9,10 +9,36 @@
                 <ImageBrush ImageSource="/Images/StartScreen.png" Stretch="UniformToFill"/>
             </Grid.Background>
 
-            <Button Name="BtnSettings" Width="60" Height="60" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20" Click="BtnSettings_Click" Cursor="Hand" Background="Transparent" BorderBrush="Transparent">
+
+
+            <Button Name="BtnSettings" 
+                    Width="60" Height="60" 
+                    HorizontalAlignment="Right" 
+                    VerticalAlignment="Top" 
+                    Margin="20" Click="BtnSettings_Click" 
+                    Cursor="Hand" 
+                    Background="Transparent" 
+                    BorderBrush="Transparent">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Image Source="/Images/SettingsButton.png" Stretch="Uniform"/>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+            <Button Name="BtnCarGarage"
+                    Width="130"
+                    Height="60"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Margin="0,442,0,0"
+                    Click="BtnCarGarage_Click"
+                    Cursor="Hand"
+                    Background="Transparent"
+                    BorderBrush="Transparent">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Image Source="/Images/CarButton.png" Stretch="Uniform"/>
                     </ControlTemplate>
                 </Button.Template>
             </Button>
@@ -25,13 +51,15 @@
                 </Button.Template>
             </Button>
 
+
+
             <StackPanel Name="MapSelectionPanel" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Text="ОБЕРІТЬ КАРТУ" Foreground="White" FontWeight="Bold" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,20">
                     <TextBlock.Effect>
                         <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="3"/>
                     </TextBlock.Effect>
                 </TextBlock>
-                
+
                 <StackPanel Orientation="Horizontal">
                     <Button Name="BtnMapWinter" Width="300" Height="300" Margin="20" Click="BtnMapWinter_Click" Cursor="Hand" Background="Transparent" BorderBrush="Transparent">
                         <Button.Template>
@@ -40,7 +68,7 @@
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
-                    
+
                     <Button Name="BtnMapForest" Width="300" Height="300" Margin="20" Click="BtnMapForest_Click" Cursor="Hand" Background="Transparent" BorderBrush="Transparent">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
@@ -82,9 +110,66 @@
                 <Canvas.Background>
                     <ImageBrush ImageSource="/Images/WinterMap.jpg" Stretch="Fill"/>
                 </Canvas.Background>
-                
+
                 <TextBlock Name="TxtPitStatus" Text="Йде обслуговування..." FontSize="28" Foreground="Yellow" FontWeight="Bold" Canvas.Left="390" Canvas.Top="630" Visibility="Collapsed"/>
             </Canvas>
         </Grid>
+
+        <Border Name="CarGaragePanel"
+        Visibility="Collapsed"
+        Background="#F22C3E50"
+        Width="360"
+        Height="260"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        CornerRadius="10">
+
+            <StackPanel Margin="25">
+
+                <TextBlock Text="ВИБІР МАШИНИ"
+                   Foreground="White"
+                   FontWeight="Bold"
+                   FontSize="18"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20"/>
+
+                <Image Name="CarPreviewImage"
+               Width="250"
+               Height="120"
+               Stretch="Uniform"
+               HorizontalAlignment="Center"
+               Margin="0,0,0,20"/>
+
+                <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+
+                    <Button Content="◀"
+                    Width="60"
+                    Margin="5"
+                    Click="BtnPrevCar_Click"
+                    Background="#27AE60"
+                    Foreground="White"
+                    FontWeight="Bold"/>
+
+                    <Button Content="Вибрати"
+                    Width="120"
+                    Margin="5"
+                    Click="BtnSelectCar_Click"
+                    Background="#2980B9"
+                    Foreground="White"
+                    FontWeight="Bold"/>
+
+                    <Button Content="▶"
+                    Width="60"
+                    Margin="5"
+                    Click="BtnNextCar_Click"
+                    Background="#27AE60"
+                    Foreground="White"
+                    FontWeight="Bold"/>
+
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
