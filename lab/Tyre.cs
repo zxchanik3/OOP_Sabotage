@@ -52,7 +52,7 @@ namespace lab
 
         public void WearDown(float speed, float dT)
         {
-            float wear = (10f * WearRate * (speed / 100f) * dT) / 40f;
+            float wear = (10f * WearRate * (speed / 100f) * dT) / 200f;
 
             preciseDurability -= wear;
             if (preciseDurability < 0) preciseDurability = 0;
