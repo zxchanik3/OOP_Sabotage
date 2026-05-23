@@ -174,7 +174,9 @@ namespace RaceGUI
             {
                 _lastSegment = currentSegment;
                 double tempSpeed = car.Speed;
-
+                
+                currentSegment.ApplyEffect(car, ref tempSpeed, dT);
+                
                 if (currentSegment is StraightSegment)
                 {
                     _targetSpeed = car.TopSpeed;

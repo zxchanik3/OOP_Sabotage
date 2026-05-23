@@ -54,7 +54,6 @@ namespace lab
             if (currentSpeed > cornerLimit)
             {
                 currentSpeed = cornerLimit;
-                car.Tyres.WearDown((float)currentSpeed, dT); 
             }
             car.Tyres.WearDown((float)currentSpeed, dT);
         }
