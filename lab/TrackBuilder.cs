@@ -35,23 +35,8 @@ public class TrackBuilder
         return this;
     }
 
-    public TrackBuilder AddPitLane(double length)
-    {
-        _track.Segments.Add(new PitLaneSegment(length));
-        _track.Length += length;
-        return this;
-    }
-        
-    public TrackBuilder AddStartFinish(double length)
-    {
-        _track.Segments.Add(new StartFinishSegment(length));
-        _track.Length += length;
-        return this;
-    }
-
     public Track Build()
     {
-        // Можна додати валідацію, чи замкнута траса, тощо
         _track.SectorsCount = _track.Segments.Count;
         return _track;
     }

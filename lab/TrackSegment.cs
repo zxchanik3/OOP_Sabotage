@@ -6,8 +6,6 @@ namespace lab
 {
     [JsonDerivedType(typeof(StraightSegment), typeDiscriminator: "Straight")]
     [JsonDerivedType(typeof(CornerSegment), typeDiscriminator: "Corner")]
-    [JsonDerivedType(typeof(PitLaneSegment), typeDiscriminator: "PitLane")]
-    [JsonDerivedType(typeof(StartFinishSegment), typeDiscriminator: "StartFinish")]
     public abstract class TrackSegment
     {
         public double Length { get; set; }
@@ -60,38 +58,6 @@ namespace lab
                 car.Tyres.WearDown(); 
             }
             car.Tyres.WearDown();
-        }
-    }
-    
-    public class PitLaneSegment : TrackSegment
-    {
-        public PitLaneSegment(double length) : base(SegmentType.PitLane, length) { }
-
-        public override void ApplyEffect(Car car, ref double currentSpeed)
-        {
-            if (currentSpeed > 80) currentSpeed = 80;
-            
-            if (car.Tyres.Durability < 40)
-            {
-                var oldType = car.Tyres.Type;
-                
-                car.ChangeTyres(TyreType.Soft);
-                
-                Console.WriteLine($"PIT-STOP {car.Model}: Заміна шин ({oldType} -> Soft).");
-                
-                currentSpeed = 5; 
-            }
-        }
-    }
-    
-    public class StartFinishSegment : TrackSegment
-    {
-        public StartFinishSegment(double length) : base(SegmentType.StartFinish, length) { }
-
-        public override void ApplyEffect(Car car, ref double currentSpeed)
-        {
-            if (currentSpeed < car.TopSpeed)
-                currentSpeed += car.Acceleration;
         }
     }
 }

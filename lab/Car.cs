@@ -59,6 +59,12 @@ namespace lab
             float newY = dir.X * MathF.Sin(angleRadians) + dir.Y * MathF.Cos(angleRadians);
             Direction = Vector2.Normalize(new Vector2(newX, newY));
         }
+        
+        public void SetPosition(Vector2 newPos, Vector2 startDirection)
+        {
+            Position = newPos;
+            Direction = startDirection;
+        }
 
         public void Move(float dT)
         {

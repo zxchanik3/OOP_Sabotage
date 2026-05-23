@@ -34,4 +34,8 @@
       </Content>
     </ItemGroup>
     
+    <ItemGroup>
+      <ProjectReference Include="..\..\lab\lab.csproj" />
+    </ItemGroup>
+    
 </Project>
