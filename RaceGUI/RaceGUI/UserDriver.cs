@@ -24,31 +24,31 @@ namespace lab
 
         public void Press(Button button)
         {
-            if (buttonState.ContainsKey(button))
-                buttonState[button] = true;
+            buttonState[button] = true;
         }
 
         public void Release(Button button)
         {
-            if (buttonState.ContainsKey(button))
-                buttonState[button] = false;
+            buttonState[button] = false;
         }
 
-        public override void Drive(Car car, float dT)
+        public override CarInput GetInput(Car car, float dT)
         {
-            if (car == null) return;
+            CarInput input = new();
 
-            float accelInput = 0f;
-            float turnInput = 0f;
+            if (buttonState[Button.Forward])
+                input.Throttle = 1f;
 
-            if (buttonState[Button.Forward]) accelInput += 1f;
-            if (buttonState[Button.Backward]) accelInput -= 1f;
-            if (buttonState[Button.Left]) turnInput -= 1f;
-            if (buttonState[Button.Right]) turnInput += 1f;
+            if (buttonState[Button.Backward])
+                input.Brake = 1f;
 
-            car.UpdateSpeed(accelInput, dT);
-            car.UpdateDirection(dT, turnInput);
-            car.Move(dT);
+            if (buttonState[Button.Left])
+                input.Steering = -1f;
+
+            if (buttonState[Button.Right])
+                input.Steering = 1f;
+
+            return input;
         }
     }
 }

@@ -2,62 +2,68 @@ using System;
 
 namespace lab
 {
-	public enum TyreType
-	{
-		Soft,
-		Medium,
-		Hard
-	}
+    public enum TyreType
+    {
+        Soft,
+        Medium,
+        Hard
+    }
 
-	public class Tyre
-	{
-		public TyreType Type { get; private set; }
-		public int Durability { get; private set; } = 100;
-		public int GripLevel { get; private set; }
-		public float WearRate { get; }
+    public class Tyre
+    {
+        public TyreType Type { get; private set; }
 
-		private int initialGrip;
+        // Зберігаємо міцність як float для точного розрахунку зносу через dT
+        private float preciseDurability = 100f;
+        public int Durability => (int)Math.Ceiling(preciseDurability);
 
-		public Tyre(TyreType type)
-		{
-			Type = type;
+        public int GripLevel { get; private set; }
+        public float WearRate { get; }
 
-			switch (type)
-			{
-				case TyreType.Soft:
-					GripLevel = 100;
-					WearRate = 2.0f;
-					break;
+        private int initialGrip;
 
-				case TyreType.Medium:
-					GripLevel = 80;
-					WearRate = 1.0f;
-					break;
+        public Tyre(TyreType type)
+        {
+            Type = type;
 
-				case TyreType.Hard:
-					GripLevel = 60;
-					WearRate = 0.5f;
-					break;
+            switch (type)
+            {
+                case TyreType.Soft:
+                    GripLevel = 100;
+                    WearRate = 2.0f;
+                    break;
 
-				default:
-					throw new ArgumentException("Unknown tyre type.");
-			}
+                case TyreType.Medium:
+                    GripLevel = 80;
+                    WearRate = 1.0f;
+                    break;
 
-			initialGrip = GripLevel;
-		}
+                case TyreType.Hard:
+                    GripLevel = 60;
+                    WearRate = 0.5f;
+                    break;
 
-		public void WearDown()
-		{
-			Durability -= (int)(10 * WearRate) / 5;
-			if (Durability < 0) Durability = 0;
+                default:
+                    throw new ArgumentException("Unknown tyre type.");
+            }
 
-			if (Durability == 0)
-			{
-				GripLevel = 0;
-				return;
-			}
+            initialGrip = GripLevel;
+        }
 
-			GripLevel = (int)(initialGrip*Durability/100f);
-		}
-	}
+        public void WearDown(float speed, float dT)
+        {
+            float wear = (10f * WearRate * (speed / 100f) * dT) / 40f;
+
+            preciseDurability -= wear;
+            if (preciseDurability < 0) preciseDurability = 0;
+
+            if (Durability == 0)
+            {
+                GripLevel = 10;
+                return;
+            }
+
+            GripLevel = (int)(initialGrip * preciseDurability / 100f);
+        }
+    }
 }

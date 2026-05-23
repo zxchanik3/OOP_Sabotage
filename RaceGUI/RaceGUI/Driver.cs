@@ -36,6 +36,9 @@ namespace lab
             Races++;
         }
 
-        public virtual void Drive(Car car, float dT) { }
+        public virtual CarInput GetInput(Car car, float dT)
+        {
+            return new CarInput();
+        }
     }
 }
