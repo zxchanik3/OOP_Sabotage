@@ -17,7 +17,6 @@ namespace lab
             Length = length;
         }
 
-        // Кожен сегмент сам вирішує, як змінити швидкість машини
         public abstract void ApplyEffect(Car car, ref double currentSpeed, float dT);
     }
     

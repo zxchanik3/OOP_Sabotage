@@ -14,13 +14,13 @@ namespace lab
         public int Weight { get; set; }
         public string ImagePath { get; set; } = "";
 
-        public float SpeedScale { get; set; } = 0.4f;
+        public float SpeedScale { get; set; } = 0.6f;
         public float Speed { get; private set; } = 0f;
         public Vector2 Position { get; private set; } = new Vector2(0, 0);
         public Vector2 Direction { get; private set; } = new Vector2(1, 0);
         private float AngularVelocity { get; set; } = 90f;
         public Tyre Tyres { get; private set; }
-        public float MaxReverseSpeed { get; set; } = 40f;
+        public float MaxReverseSpeed { get; set; } = 30f;
 
         public Car(string model, string team, int year, int horsepower, float acceleration, int topSpeed, int weight, string imagePath)
         {

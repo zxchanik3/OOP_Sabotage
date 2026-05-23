@@ -34,6 +34,16 @@ namespace RaceGUI
 
         private DispatcherTimer _timer = new();
 
+        private Dictionary<Car, int> _carLastWaypoint = new();
+        private Dictionary<Car, int> _carLaps = new();
+        private Rect _pitArea = new Rect(400, 480, 200, 50);
+        private TrackSegment? _lastSegment;
+        private double _targetSpeed;
+        private double _pitLaneSpeedLimit = 60;
+        private int _pitTimeLeft;
+        private bool _hasBeenServed = false;
+        private DispatcherTimer _pitTimer = new();
+
         // ================= STATE =================
         private bool _isRaceFinished;
         private int _selectedLaps = 5;
@@ -58,30 +68,9 @@ namespace RaceGUI
 
         private void InitializeGame()
         {
-            Directory.CreateDirectory(_dataFolder);
-            _gameData.AddCar(new CarConfig("Car1", "Blue", 2020, 670, 3, 250, 780, "Images/car1.png"));
-            _gameData.AddCar(new CarConfig("Car2", "Green", 2021, 720, 2, 260, 750, "Images/car2.png"));
-            _gameData.AddCar(new CarConfig("Car3", "Purple", 2019, 650, 4, 240, 800, "Images/car3.png"));
-            _gameData.AddCar(new CarConfig("Car4", "Yellow", 2022, 700, 3.5f, 255, 770, "Images/car4.png"));
-            _gameData.AddCar(new CarConfig("Car5", "Red", 2023, 750, 2.5f, 270, 730, "Images/car5.png"));
-            _gameData.AddCar(new CarConfig("Car6", "Orange", 2020, 680, 3.2f, 245, 790, "Images/car6.png"));
-            _gameData.AddCar(new CarConfig("Car7", "Cyan", 2021, 710, 2.8f, 265, 760, "Images/car7.png"));
-
-            _gameData.AddDriver(new DriverConfig("Player", 77, false));
-            _gameData.AddDriver(new DriverConfig("Lewis", 11, true));
-            _gameData.AddDriver(new DriverConfig("Kimi", 22, true));
-            _gameData.AddDriver(new DriverConfig("Max", 33, true));
-            _gameData.AddDriver(new DriverConfig("Toto", 44, true));
-            _gameData.AddDriver(new DriverConfig("Nico", 55, true));
-            _gameData.AddDriver(new DriverConfig("George", 66, true));
-
-
-
-            _gameData.CarSaveToFile(System.IO.Path.Combine(_dataFolder, "CarsData.json")); 
-            _gameData.DriverSaveToFile(System.IO.Path.Combine(_dataFolder, "DriversData.json"));
-
             _gameData.CarLoadFromFile(System.IO.Path.Combine(_dataFolder, "CarsData.json"));
             _gameData.TrackLoadFromFile(System.IO.Path.Combine(_dataFolder, "TracksData.json"));
+            _gameData.DriverLoadFromFile(System.IO.Path.Combine(_dataFolder, "DriversData.json"));
 
             _carOptions = _gameData.Cars
                 .Select(c => new Car(
@@ -140,44 +129,174 @@ namespace RaceGUI
         //LOOP
         private void Timer_Tick(object? sender, EventArgs e)
         {
+            float dT = 0.1f;
             if (_cars.Count == 0 || _isRaceFinished) return;
 
+            var driver = _userDriver;
             var car = _cars[0];
 
-            int closest = GetClosestNodeIndex(car.Position);
-            var node = _trackNodes[closest];
+            int closestWpForLogic = GetClosestNodeIndex(car.Position, out float distToWp);
+            TrackNode currentNode = _trackNodes[closestWpForLogic];
+            TrackSegment currentSegment = currentNode.Logic;
 
-            Vector2 dir = node.Position - car.Position;
+            CarInput input = _isPitServing
+                ? new CarInput { Throttle = 0f, Brake = 1f, Steering = 0f }
+                : driver.GetInput(car, dT);
 
-            if (dir.Length() > 1f)
+            if (!_isPitServing)
             {
-                dir = Vector2.Normalize(dir);
-                car.SetPosition(car.Position + dir * 3f, car.Direction);
-            }
+                double tempSpeed = car.Speed;
+                currentSegment.ApplyEffect(car, ref tempSpeed, dT);
 
-            var input = _userDriver.GetInput(car, 0.1f);
-            car.Update(input, 0.1f, new StraightSegment(100));
-
-            UpdateCarVisual(car);
-            UpdateHUD(car);
-        }
-
-        private int GetClosestNodeIndex(Vector2 pos)
-        {
-            int best = 0;
-            float bestDist = float.MaxValue;
-
-            for (int i = 0; i < _trackNodes.Count; i++)
-            {
-                float d = Vector2.Distance(pos, _trackNodes[i].Position);
-                if (d < bestDist)
+                if (currentSegment is StraightSegment)
                 {
-                    bestDist = d;
-                    best = i;
+                    _targetSpeed = car.TopSpeed;
+                }
+                else
+                {
+                    _targetSpeed = tempSpeed;
+                }
+
+                if (car.Speed > _targetSpeed)
+                {
+                    input.Throttle = 0f;
+                    input.Brake = Math.Max(input.Brake, 0.4f);
                 }
             }
 
-            return best;
+            if (distToWp > 55f)
+            {
+                Vector2 pushDirection = Vector2.Normalize(currentNode.Position - car.Position);
+
+                Vector2 nextDirection = car.Direction;
+                if (_trackNodes.Count > (closestWpForLogic + 1))
+                {
+                    nextDirection = Vector2.Normalize(_trackNodes[closestWpForLogic + 1].Position - currentNode.Position);
+                }
+                else
+                {
+                    nextDirection = Vector2.Normalize(_trackNodes[0].Position - currentNode.Position);
+                }
+
+                car.SetPosition(currentNode.Position - pushDirection * 3f, nextDirection);
+            }
+            float maxAllowedDistance = 45f;
+
+            if (distToWp > maxAllowedDistance)
+            {
+                Vector2 pushDir = Vector2.Normalize(currentNode.Position - car.Position);
+
+                float penetrationDepth = distToWp - maxAllowedDistance;
+
+                Vector2 correction = pushDir * (penetrationDepth * 0.3f);
+                Vector2 newPosition = car.Position + correction;
+
+                input.Brake = 1.0f;
+                input.Throttle = 0.0f;
+
+                car.SetPosition(newPosition, car.Direction);
+            }
+            else if (distToWp > 35f && car.Speed > 30f)
+            {
+                input.Throttle *= 0.5f;
+                input.Brake = Math.Max(input.Brake, 0.3f);
+            }
+
+            Point carPoint = new Point(car.Position.X, car.Position.Y);
+            if (_pitArea.Contains(carPoint))
+            {
+                if (_autoPitLimiter && car.Speed > _pitLaneSpeedLimit)
+                {
+                    input.Throttle = 0f;
+                    input.Brake = Math.Max(input.Brake, 0.5f);
+                }
+
+                if (!_isPitServing && !_hasBeenServed && car.Speed < 40f)
+                {
+                    _isPitServing = true;
+                    TxtPitStatus.Visibility = Visibility.Visible;
+                    _pitTimeLeft = 20;
+                    _pitTimer.Start();
+                }
+            }
+            else
+            {
+                _hasBeenServed = false;
+            }
+
+            car.Update(input, dT, currentSegment);
+
+            if (_carVisuals.TryGetValue(car, out Image? img))
+            {
+                double x = car.Position.X - (img.Width / 2);
+                double y = car.Position.Y - (img.Height / 2);
+
+                Canvas.SetLeft(img, x);
+                Canvas.SetTop(img, y);
+
+                double angle = Math.Atan2(car.Direction.Y, car.Direction.X) * (180 / Math.PI);
+
+                img.RenderTransform = new RotateTransform(angle);
+            }
+            if (!_carLastWaypoint.ContainsKey(car)) _carLastWaypoint[car] = 0;
+            if (!_carLaps.ContainsKey(car)) _carLaps[car] = 0;
+
+            int lastWp = _carLastWaypoint[car];
+
+            if (lastWp >= _trackNodes.Count - 8 && closestWpForLogic <= 5)
+            {
+                _carLaps[car]++;
+                _carLastWaypoint[car] = closestWpForLogic;
+
+                if (_carLaps[car] >= _track.RequiredLapCount)
+                {
+                    _isRaceFinished = true;
+                    _timer.Stop();
+                    if (_raceMusicPlayer != null) _raceMusicPlayer.Stop();
+                    if (_menuMusicPlayer != null) _menuMusicPlayer.Play();
+                    TxtStatus.Text = "🏁 ФІНІШ! Гонка завершена!";
+                    return;
+                }
+            }
+            else if (Math.Abs(closestWpForLogic - lastWp) < 10)
+            {
+                _carLastWaypoint[car] = closestWpForLogic;
+            }
+
+            int currentLap = _carLaps.ContainsKey(car) ? _carLaps[car] + 1 : 1;
+            int currentSpeed = (int)car.Speed;
+            int tyreDurability = car.Tyres != null ? (int)car.Tyres.Durability : 100;
+
+            TxtStatus.Text = $"Коло: {currentLap}/{_track.RequiredLapCount} | Швидкість: {currentSpeed} км/год | Шини: {tyreDurability}%";
+        }
+
+        private void PitTimer_Tick(object? sender, EventArgs e)
+        {
+            _pitTimeLeft--;
+            if (_pitTimeLeft <= 0)
+            {
+                _pitTimer.Stop();
+                _isPitServing = false;
+                TxtPitStatus.Visibility = Visibility.Collapsed;
+                _hasBeenServed = true;
+                _cars[0].ChangeTyres(_cars[0].Tyres.Type);
+            }
+        }
+
+        private int GetClosestNodeIndex(Vector2 pos, out float distance)
+        {
+            int bestIdx = 0;
+            distance = float.MaxValue;
+            for (int i = 0; i < _trackNodes.Count; i++)
+            {
+                float d = Vector2.Distance(pos, _trackNodes[i].Position);
+                if (d < distance)
+                {
+                    distance = d;
+                    bestIdx = i;
+                }
+            }
+            return bestIdx;
         }
 
         private void UpdateCarVisual(Car car)
@@ -439,6 +558,7 @@ namespace RaceGUI
             UpdateCarPreview();
         }
 
+        //оновлення прев'ю машини при виборі
         private void UpdateCarPreview()
         {
             if (_carOptions.Count == 0 || _carIndex < 0 || _carIndex >= _carOptions.Count) return;

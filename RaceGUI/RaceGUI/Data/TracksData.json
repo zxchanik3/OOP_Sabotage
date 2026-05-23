@@ -1,0 +1,362 @@
+[
+  {
+    "Name": "WinterGP",
+    "Laps": 3,
+    "Nodes": [
+      {
+        "X": 552,
+        "Y": 560,
+        "Length": 100,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 593,
+        "Y": 559,
+        "Length": 100,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 637,
+        "Y": 562,
+        "Length": 100,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 680,
+        "Y": 562,
+        "Length": 100,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 731,
+        "Y": 562,
+        "Length": 100,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 780,
+        "Y": 560,
+        "Length": 100,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 823,
+        "Y": 546,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 859,
+        "Y": 516,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 888,
+        "Y": 481,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 915,
+        "Y": 435,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 933,
+        "Y": 389,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 934,
+        "Y": 344,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 900,
+        "Y": 322,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 844,
+        "Y": 324,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 806,
+        "Y": 350,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 775,
+        "Y": 381,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 732,
+        "Y": 403,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 691,
+        "Y": 382,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 676,
+        "Y": 330,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 688,
+        "Y": 273,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 724,
+        "Y": 222,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 772,
+        "Y": 189,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 825,
+        "Y": 151,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 848,
+        "Y": 88,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 799,
+        "Y": 42,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 728,
+        "Y": 32,
+        "Length": 50,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 654,
+        "Y": 38,
+        "Length": 50,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 591,
+        "Y": 54,
+        "Length": 50,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 540,
+        "Y": 88,
+        "Length": 50,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 527,
+        "Y": 146,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 542,
+        "Y": 198,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 560,
+        "Y": 261,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 560,
+        "Y": 318,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 517,
+        "Y": 355,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 460,
+        "Y": 341,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 432,
+        "Y": 287,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 412,
+        "Y": 223,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 384,
+        "Y": 166,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 339,
+        "Y": 116,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 280,
+        "Y": 97,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 207,
+        "Y": 110,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 154,
+        "Y": 134,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 124,
+        "Y": 177,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 107,
+        "Y": 238,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 124,
+        "Y": 304,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 164,
+        "Y": 338,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 198,
+        "Y": 382,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 187,
+        "Y": 429,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 169,
+        "Y": 483,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 189,
+        "Y": 536,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 244,
+        "Y": 556,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 304,
+        "Y": 559,
+        "Length": 50,
+        "SegmentType": "Corner"
+      },
+      {
+        "X": 362,
+        "Y": 559,
+        "Length": 50,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 416,
+        "Y": 561,
+        "Length": 50,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 467,
+        "Y": 561,
+        "Length": 50,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 509,
+        "Y": 561,
+        "Length": 50,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 380,
+        "Y": 494,
+        "Length": 50,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 432,
+        "Y": 493,
+        "Length": 50,
+        "SegmentType": "Straight"
+      },
+      {
+        "X": 482,
+        "Y": 493,
+        "Length": 50,
+        "SegmentType": "Straight"
+      }
+    ]
+  }
+]

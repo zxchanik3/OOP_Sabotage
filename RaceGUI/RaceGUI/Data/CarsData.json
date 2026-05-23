@@ -1,0 +1,72 @@
+[
+  {
+    "Model": "Car1",
+    "Team": "Blue",
+    "Year": 2020,
+    "Horsepower": 670,
+    "Acceleration": 3,
+    "TopSpeed": 250,
+    "Weight": 780,
+    "ImagePath": "Images/car1.png"
+  },
+  {
+    "Model": "Car2",
+    "Team": "Green",
+    "Year": 2021,
+    "Horsepower": 720,
+    "Acceleration": 2,
+    "TopSpeed": 260,
+    "Weight": 750,
+    "ImagePath": "Images/car2.png"
+  },
+  {
+    "Model": "Car3",
+    "Team": "Purple",
+    "Year": 2019,
+    "Horsepower": 650,
+    "Acceleration": 4,
+    "TopSpeed": 240,
+    "Weight": 800,
+    "ImagePath": "Images/car3.png"
+  },
+  {
+    "Model": "Car4",
+    "Team": "Yellow",
+    "Year": 2022,
+    "Horsepower": 700,
+    "Acceleration": 3.5,
+    "TopSpeed": 255,
+    "Weight": 770,
+    "ImagePath": "Images/car4.png"
+  },
+  {
+    "Model": "Car5",
+    "Team": "Red",
+    "Year": 2023,
+    "Horsepower": 750,
+    "Acceleration": 2.5,
+    "TopSpeed": 270,
+    "Weight": 730,
+    "ImagePath": "Images/car5.png"
+  },
+  {
+    "Model": "Car6",
+    "Team": "Orange",
+    "Year": 2020,
+    "Horsepower": 680,
+    "Acceleration": 3.2,
+    "TopSpeed": 245,
+    "Weight": 790,
+    "ImagePath": "Images/car6.png"
+  },
+  {
+    "Model": "Car7",
+    "Team": "Cyan",
+    "Year": 2021,
+    "Horsepower": 710,
+    "Acceleration": 2.8,
+    "TopSpeed": 265,
+    "Weight": 760,
+    "ImagePath": "Images/car7.png"
+  }
+]

@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Numerics;
 
 namespace lab
 {
@@ -17,6 +18,7 @@ namespace lab
         public int Weight { get; set; }
         public string ImagePath { get; set; } = "";
 
+        public CarConfig() { }
         public CarConfig(string model, string team, int year, int horsepower, float acceleration, int topSpeed, int weight, string imagePath)
         {
             Model = model;
@@ -35,6 +37,7 @@ namespace lab
         public int Number { get; set; }
         public bool Lock { get; set; }
 
+        public DriverConfig() { }
         public DriverConfig(string name, int number, bool lockStatus)
         {
             Name = name;
@@ -46,11 +49,16 @@ namespace lab
     {
         public float X { get; set; }
         public float Y { get; set; }
+        public double Length { get; set; }
+        public string SegmentType { get; set; } = "Straight";
 
-        public TrackNodeConfig(float x, float y)
+        public TrackNodeConfig() { }
+        public TrackNodeConfig(float x, float y, double length, string segmentType)
         {
             X = x;
             Y = y;
+            Length = length;
+            SegmentType = segmentType;
         }
     }
     public class TrackConfig
@@ -59,6 +67,7 @@ namespace lab
         public int Laps { get; set; }
         public List<TrackNodeConfig> Nodes { get; set; } = new();
 
+        public TrackConfig() { }
         public TrackConfig(string name, int laps, List<TrackNodeConfig> nodes)
         {
             Name = name;
