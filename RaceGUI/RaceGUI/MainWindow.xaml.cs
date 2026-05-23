@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Windows;
@@ -13,23 +13,23 @@ namespace RaceGUI
 {
     public partial class MainWindow : Window
     {
-        private DispatcherTimer _timer;
-        private List<Car> _cars;
-        private List<Driver> _drivers;
-        private Dictionary<Car, Rectangle> _carVisuals;
-        private UserDriver _userDriver;
+        private DispatcherTimer _timer = null!;
+        private List<Car> _cars = null!;
+        private List<Driver> _drivers = null!;
+        private Dictionary<Car, Rectangle> _carVisuals = null!;
+        private UserDriver _userDriver = null!;
         private Dictionary<Car, int> _carLaps = new();
         private Dictionary<Car, int> _carLastWaypoint = new();
         private bool _isRaceFinished = false;
-        private Rect _pitArea = new Rect(350, 470, 170, 50); 
-        private DispatcherTimer _pitTimer; 
-        private bool _isPitServing = false; 
+        private Rect _pitArea = new Rect(350, 470, 170, 50);
+        private DispatcherTimer _pitTimer = null!;
+        private bool _isPitServing = false;
         private int _pitTimeLeft = 0;
         private bool _hasBeenServed = false;
-        private TrackSegment _lastSegment = null;
+        private TrackSegment? _lastSegment = null;
         private double _targetSpeed = 1000;
-        private Track _track;
-        private List<TrackNode> _trackNodes;
+        private Track _track = null!;
+        private List<TrackNode> _trackNodes = null!;
         private string _selectedTrackName = "";
         private int _selectedLaps = 5;
         private bool _autoPitLimiter = true;
@@ -51,14 +51,15 @@ namespace RaceGUI
             for (int i = 0; i < _trackNodes.Count; i++)
             {
                 float d = Vector2.Distance(pos, _trackNodes[i].Position);
-                if (d < distance) 
-                { 
-                    distance = d; 
-                    bestIdx = i; 
+                if (d < distance)
+                {
+                    distance = d;
+                    bestIdx = i;
                 }
             }
             return bestIdx;
         }
+
         private void InitializeMusic()
         {
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
@@ -76,12 +77,13 @@ namespace RaceGUI
 
             _menuMusicPlayer.Play();
         }
+
         private void InitializeGame()
         {
             _cars = new List<Car>();
             _drivers = new List<Driver>();
             _carVisuals = new Dictionary<Car, Rectangle>();
-            
+
             StraightSegment s = new StraightSegment(100);
             CornerSegment c = new CornerSegment(50.0, 2);
 
@@ -135,16 +137,18 @@ namespace RaceGUI
 
             Rectangle rect = new Rectangle
             {
-                Width = 24, Height = 14,
+                Width = 24,
+                Height = 14,
                 Fill = Brushes.Red,
-                Stroke = Brushes.Black, StrokeThickness = 1
+                Stroke = Brushes.Black,
+                StrokeThickness = 1
             };
             _carVisuals[userCar] = rect;
             GameCanvas.Children.Add(rect);
 
             _pitTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
-            _pitTimer.Tick += PitTimer_Tick; 
-            
+            _pitTimer.Tick += PitTimer_Tick;
+
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
             _timer.Tick += Timer_Tick;
         }
@@ -158,15 +162,71 @@ namespace RaceGUI
 
             if (_isRaceFinished) return;
 
-            if (!_isPitServing)
+            int closestWpForLogic = GetClosestNodeIndex(car.Position, out float distToWp);
+            TrackNode currentNode = _trackNodes[closestWpForLogic];
+            TrackSegment currentSegment = currentNode.Logic;
+
+            CarInput input = _isPitServing
+                ? new CarInput { Throttle = 0f, Brake = 1f, Steering = 0f }
+                : driver.GetInput(car, dT);
+
+            if (currentSegment != _lastSegment && !_isPitServing)
             {
-                driver.Drive(car, dT);
+                _lastSegment = currentSegment;
+                double tempSpeed = car.Speed;
+
+                if (currentSegment is StraightSegment)
+                {
+                    _targetSpeed = car.TopSpeed;
+                }
+                else
+                {
+                    _targetSpeed = tempSpeed;
+                }
+            }
+
+            if (car.Speed > _targetSpeed && !_isPitServing)
+            {
+                input.Throttle = 0f;
+                input.Brake = 0.5f;
+            }
+
+            // Повернення машини на трасу, якщо вона відлетіла дуже далеко від вузла
+            if (distToWp > 55f)
+            {
+                Vector2 pushDirection = Vector2.Normalize(currentNode.Position - car.Position);
+                car.SetPosition(car.Position + pushDirection * 3f, car.Direction);
+            }
+            else if (distToWp > 45f && car.Speed > 20f)
+            {
+                input.Throttle = 0f;
+                input.Brake = Math.Max(input.Brake, 0.2f);
+            }
+
+            // Логіка автоматичного піт-лімітера
+            Point carPoint = new System.Windows.Point(car.Position.X, car.Position.Y);
+            if (_pitArea.Contains(carPoint))
+            {
+                if (_autoPitLimiter && car.Speed > _pitLaneSpeedLimit)
+                {
+                    input.Throttle = 0f;
+                    input.Brake = Math.Max(input.Brake, 0.4f);
+                }
+
+                if (!_isPitServing && !_hasBeenServed && car.Speed < 40f)
+                {
+                    _isPitServing = true;
+                    TxtPitStatus.Visibility = Visibility.Visible;
+                    _pitTimeLeft = 20;
+                    _pitTimer.Start();
+                }
             }
             else
             {
-                car.UpdateSpeed(-2f, dT);
-                car.Move(dT);
+                _hasBeenServed = false;
             }
+
+            car.Update(input, dT, currentSegment);
 
             Rectangle rect = _carVisuals[car];
             double x = car.Position.X - rect.Width / 2;
@@ -178,52 +238,16 @@ namespace RaceGUI
             double angle = Math.Atan2(car.Direction.Y, car.Direction.X) * (180 / Math.PI);
             rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
 
+            //Обрахунок кіл та вейпоінтів
             if (!_carLastWaypoint.ContainsKey(car)) _carLastWaypoint[car] = 0;
             if (!_carLaps.ContainsKey(car)) _carLaps[car] = 0;
 
-            int closestWp = GetClosestNodeIndex(car.Position, out float distToWp);
             int lastWp = _carLastWaypoint[car];
-            TrackNode currentNode = _trackNodes[closestWp];
 
-            if (currentNode.Logic != _lastSegment && !_isPitServing)
-            {
-                _lastSegment = currentNode.Logic; 
-                double tempSpeed = car.Speed;
-                currentNode.Logic.ApplyEffect(car, ref tempSpeed);
-
-                if (currentNode.Logic is StraightSegment)
-                {
-                    _targetSpeed = car.TopSpeed; 
-                }
-                else
-                {
-                    _targetSpeed = tempSpeed; 
-                }
-            }
-
-            if (car.Speed > _targetSpeed && !_isPitServing)
-            {
-                car.UpdateSpeed(-2.0f, dT); 
-            }
-
-            if (distToWp > 55f) 
-            {
-                car.UpdateSpeed(-1000f, dT); 
-                Vector2 pushDirection = Vector2.Normalize(currentNode.Position - car.Position);
-                car.SetPosition(car.Position + pushDirection * 3f, car.Direction);
-            }
-            else if (distToWp > 45f) 
-            {
-                if (car.Speed > 20f) 
-                {
-                    car.UpdateSpeed(-6.0f, dT); 
-                }
-            }
-
-            if (lastWp >= _trackNodes.Count - 8 && closestWp <= 5)
+            if (lastWp >= _trackNodes.Count - 8 && closestWpForLogic <= 5)
             {
                 _carLaps[car]++;
-                _carLastWaypoint[car] = closestWp; 
+                _carLastWaypoint[car] = closestWpForLogic;
 
                 if (_carLaps[car] >= _track.RequiredLapCount)
                 {
@@ -233,34 +257,12 @@ namespace RaceGUI
                     return;
                 }
             }
-            else if (Math.Abs(closestWp - lastWp) < 10) 
+            else if (Math.Abs(closestWpForLogic - lastWp) < 10)
             {
-                _carLastWaypoint[car] = closestWp;
+                _carLastWaypoint[car] = closestWpForLogic;
             }
 
-            Point carPoint = new System.Windows.Point(car.Position.X, car.Position.Y);
-            if (_pitArea.Contains(carPoint))
-            {
-                if (_autoPitLimiter && car.Speed > _pitLaneSpeedLimit)
-                {
-                    car.UpdateSpeed(-2.5f, dT); 
-                }
-
-                if (!_isPitServing && !_hasBeenServed && car.Speed < 40f)
-                {
-                    _isPitServing = true; 
-                    TxtPitStatus.Visibility = Visibility.Visible; 
-                    car.UpdateSpeed(-2f, dT); 
-
-                    _pitTimeLeft = 20; 
-                    _pitTimer.Start(); 
-                }
-            }
-            else
-            {
-                _hasBeenServed = false; 
-            }
-
+            // 7. Вивід тексту стану
             int currentLap = _carLaps.ContainsKey(_cars[0]) ? _carLaps[_cars[0]] + 1 : 1;
             int speed = (int)_cars[0].Speed;
             int tyreDurability = (int)_cars[0].Tyres.Durability;
@@ -273,9 +275,9 @@ namespace RaceGUI
             _pitTimeLeft--;
             if (_pitTimeLeft <= 0)
             {
-                _pitTimer.Stop(); 
-                _isPitServing = false; 
-                TxtPitStatus.Visibility = Visibility.Collapsed; 
+                _pitTimer.Stop();
+                _isPitServing = false;
+                TxtPitStatus.Visibility = Visibility.Collapsed;
                 _hasBeenServed = true;
                 _cars[0].ChangeTyres(_cars[0].Tyres.Type);
             }
@@ -301,6 +303,7 @@ namespace RaceGUI
             BtnPlayGame.Visibility = Visibility.Collapsed;
             MapSelectionPanel.Visibility = Visibility.Visible;
         }
+
         private void BtnMapWinter_Click(object sender, RoutedEventArgs e)
         {
             StartGameOnMap("Winter");
@@ -353,7 +356,7 @@ namespace RaceGUI
             }
 
             if (_userDriver == null || _isPitServing) return;
-            
+
             switch (e.Key)
             {
                 case Key.W: case Key.Up: _userDriver.Press(lab.Button.Forward); break;

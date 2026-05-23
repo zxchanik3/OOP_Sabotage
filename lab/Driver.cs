@@ -7,15 +7,17 @@ namespace lab
         public string Name { get; set; } = "Unknown";
         public int Number { get; set; }
         public string Team { get; set; } = "Independent";
+
         public int Wins { get; set; }
         public int Races { get; set; }
         public int Podiums { get; set; }
         public int Position { get; set; }
+
         public bool Lock { get; protected set; }
 
-        public Driver() { }
+        protected Driver() { }
 
-        public Driver(string name, int number, bool lockStatus)
+        protected Driver(string name, int number, bool lockStatus)
         {
             Name = name;
             Number = number;
@@ -34,6 +36,9 @@ namespace lab
             Races++;
         }
 
-        public virtual void Drive(Car car, float dT) { }
+        public virtual CarInput GetInput(Car car, float dT)
+        {
+            return new CarInput();
+        }
     }
 }

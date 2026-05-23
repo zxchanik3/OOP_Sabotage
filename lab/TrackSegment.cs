@@ -18,14 +18,14 @@ namespace lab
         }
 
         // Кожен сегмент сам вирішує, як змінити швидкість машини
-        public abstract void ApplyEffect(Car car, ref double currentSpeed);
+        public abstract void ApplyEffect(Car car, ref double currentSpeed, float dT);
     }
     
     public class StraightSegment : TrackSegment
     {
         public StraightSegment(double length) : base(SegmentType.Straight, length) { }
 
-        public override void ApplyEffect(Car car, ref double currentSpeed)
+        public override void ApplyEffect(Car car, ref double currentSpeed, float dT)
         {
             double acceleration = car.Acceleration * 2.0; 
             currentSpeed += acceleration;
@@ -44,9 +44,8 @@ namespace lab
             Difficulty = difficulty;
         }
 
-        public override void ApplyEffect(Car car, ref double currentSpeed)
+        public override void ApplyEffect(Car car, ref double currentSpeed, float dT)
         {
-            // Обмеження швидкості в повороті залежить від шин
             double grip = Math.Max(car.Tyres.GripLevel, 10);
             double gripFactor = car.Tyres.GripLevel / 100.0;
             
@@ -55,9 +54,9 @@ namespace lab
             if (currentSpeed > cornerLimit)
             {
                 currentSpeed = cornerLimit;
-                car.Tyres.WearDown(); 
+                car.Tyres.WearDown((float)currentSpeed, dT); 
             }
-            car.Tyres.WearDown();
+            car.Tyres.WearDown((float)currentSpeed, dT);
         }
     }
 }

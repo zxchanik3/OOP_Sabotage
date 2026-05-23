@@ -1,12 +1,22 @@
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace lab
 {
     public interface IDriveStrategy
     {
-        void Drive(Car car, float dT, float timeToOpponent, TrackSegment trackSegment);
+        CarInput GetInput(
+            Car car,
+            float dT,
+            float timeToOpponent,
+            TrackSegment trackSegment
+        );
     }
 
+    // =========================
+    // NPC DRIVER (без змін фізики)
+    // =========================
     public class NPCDriver : Driver
     {
         private IDriveStrategy strategy;
@@ -24,77 +34,171 @@ namespace lab
 
         public void SetStrategy(IDriveStrategy newStrategy)
         {
-            if (newStrategy != null) strategy = newStrategy;
-        }
-
-        public override void Drive(Car car, float dT)
-        {
-            if (car == null || strategy == null) return;
-            if (raceContext.CurrentSegment == null) return;
-
-            strategy.Drive(car, dT, raceContext.TimeToOpponent, raceContext.CurrentSegment);
+            if (newStrategy != null)
+                strategy = newStrategy;
         }
 
         public void UpdateContext(RaceContext context)
         {
-            if (context != null) raceContext = context;
+            raceContext = context;
+        }
+
+        public override CarInput GetInput(Car car, float dT)
+        {
+            if (car == null || strategy == null)
+                return new CarInput();
+
+            return strategy.GetInput(
+                car,
+                dT,
+                raceContext.TimeToOpponent,
+                raceContext.CurrentSegment
+            );
         }
     }
 
-    public class AttackStrategy : IDriveStrategy
+    // =========================
+    // BASE WAYPOINT STRATEGY
+    // =========================
+    public class BaseWaypointStrategy : IDriveStrategy
     {
-        public void Drive(Car car, float dT, float timeToOpponent, TrackSegment segment)
-        {
-            float accel = 1.0f;
-            float turn = 0.0f;
+        protected List<Vector2> _waypoints;
+        protected int _currentWpIndex;
 
-            if (segment.Type == SegmentType.Corner)
+        protected float SpeedModifier = 1.0f;
+        protected float BrakeSensitivity = 0.95f;
+
+        public BaseWaypointStrategy(List<Vector2> waypoints, int startIndex = 1)
+        {
+            _waypoints = waypoints;
+            _currentWpIndex = startIndex;
+        }
+
+        public virtual CarInput GetInput(
+            Car car,
+            float dT,
+            float timeToOpponent,
+            TrackSegment trackSegment)
+        {
+            CarInput input = new CarInput();
+
+            if (_waypoints == null || _waypoints.Count == 0)
+                return input;
+
+            Vector2 target = _waypoints[_currentWpIndex];
+
+            float dist = Vector2.Distance(car.Position, target);
+
+            if (dist < 50f)
             {
-                accel = 0.8f;
-                turn = 0.7f;
+                _currentWpIndex = (_currentWpIndex + 1) % _waypoints.Count;
+                target = _waypoints[_currentWpIndex];
             }
 
-            car.UpdateSpeed(accel, dT);
-            car.UpdateDirection(dT, turn);
-            car.Move(dT);
+            Vector2 toTarget = Vector2.Normalize(target - car.Position);
+
+            float cross =
+                (car.Direction.X * toTarget.Y) -
+                (car.Direction.Y * toTarget.X);
+
+            float dot = Vector2.Dot(car.Direction, toTarget);
+
+            input.Steering = Math.Clamp(cross * 4.5f, -1f, 1f);
+
+            if (dot < BrakeSensitivity)
+            {
+                input.Brake = 0.5f;
+                input.Throttle = 0f;
+            }
+            else
+            {
+                input.Throttle = SpeedModifier;
+                input.Brake = 0f;
+            }
+
+            return input;
         }
     }
 
-    public class NormalStrategy : IDriveStrategy
+    // =========================
+    // ATTACK STRATEGY
+    // =========================
+    public class AttackStrategy : BaseWaypointStrategy
     {
-        public void Drive(Car car, float dT, float timeToOpponent, TrackSegment segment)
+        public AttackStrategy(List<Vector2> waypoints, int startIndex = 1)
+            : base(waypoints, startIndex)
         {
-            float accel = 0.8f;
-            float turn = 0.0f;
+            SpeedModifier = 1.15f;
+            BrakeSensitivity = 0.92f;
+        }
 
-            if (segment.Type == SegmentType.Corner)
+        public override CarInput GetInput(
+            Car car,
+            float dT,
+            float timeToOpponent,
+            TrackSegment trackSegment)
+        {
+            CarInput input =
+                base.GetInput(car, dT, timeToOpponent, trackSegment);
+
+            // агресивна поведінка біля суперника
+            if (timeToOpponent > 0 && timeToOpponent < 1.5f)
             {
-                accel = 0.6f;
-                turn = 0.5f;
+                input.Brake *= 0.7f;
+                input.Throttle *= 1.1f;
             }
 
-            car.UpdateSpeed(accel, dT);
-            car.UpdateDirection(dT, turn);
-            car.Move(dT);
+            // знос шин через агресію
+            if (car.Tyres != null && car.Speed > 50f)
+            {
+                car.Tyres.WearDown(car.Speed, dT);
+            }
+
+            return input;
         }
     }
 
-    public class DefenseStrategy : IDriveStrategy
+    // =========================
+    // NORMAL STRATEGY
+    // =========================
+    public class NormalStrategy : BaseWaypointStrategy
     {
-        public void Drive(Car car, float dT, float timeToOpponent, TrackSegment segment)
+        public NormalStrategy(List<Vector2> waypoints, int startIndex = 1)
+            : base(waypoints, startIndex)
         {
-            float accel = 0.6f;
-            float turn = 0.0f;
+            SpeedModifier = 1.0f;
+            BrakeSensitivity = 0.96f;
+        }
+    }
 
-            if (segment.Type == SegmentType.Corner)
+    // =========================
+    // DEFENSE STRATEGY
+    // =========================
+    public class DefenseStrategy : BaseWaypointStrategy
+    {
+        public DefenseStrategy(List<Vector2> waypoints, int startIndex = 1)
+            : base(waypoints, startIndex)
+        {
+            SpeedModifier = 0.9f;
+            BrakeSensitivity = 0.98f;
+        }
+
+        public override CarInput GetInput(
+            Car car,
+            float dT,
+            float timeToOpponent,
+            TrackSegment trackSegment)
+        {
+            CarInput input =
+                base.GetInput(car, dT, timeToOpponent, trackSegment);
+
+            // обережніше при близьких суперниках
+            if (timeToOpponent > 0 && timeToOpponent < 1.5f)
             {
-                accel = 0.4f;
-                turn = 0.3f;
+                input.Brake += 0.2f;
             }
 
-            car.UpdateSpeed(accel, dT);
-            car.UpdateDirection(dT, turn);
-            car.Move(dT);
+            return input;
         }
     }
 }
