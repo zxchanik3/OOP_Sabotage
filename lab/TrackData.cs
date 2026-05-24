@@ -2,21 +2,21 @@ namespace lab;
 
 public class TrackData
 {
-    public string TrackName { get; set; }
-    public List<NodePoint> Nodes { get; set; }
-    public List<SegmentData> Segments { get; set; }
+    public string TrackName { get; init; } = string.Empty;
+    public List<NodePoint> Nodes { get; init; } = new();
+    public List<SegmentData> Segments { get; init; } = new();
 }
 
 public class NodePoint
 {
-    public float X { get; set; }
-    public float Y { get; set; }
+    public float X { get; init; }
+    public float Y { get; init; }
 }
 
 public class SegmentData
 {
-    public string Type { get; set; }
-    public int StartIndex { get; set; }
-    public int EndIndex { get; set; }
-    public float CornerLimit { get; set; }
+    public string Type { get; init; } = string.Empty;
+    public int StartIndex { get; init; }
+    public int EndIndex { get; init; }
+    public float CornerLimit { get; init; }
 }

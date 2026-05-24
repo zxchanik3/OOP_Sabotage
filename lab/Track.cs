@@ -1,30 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-
-namespace lab
+﻿namespace lab
 {
     public class Track
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public int RequiredLapCount { get; set; }
         public double Length { get; set; }
 
-        public int SectorsCount { get; set; }
+        public int SectorsCount => Segments.Count;
 
         public List<TrackSegment> Segments { get; set; } = new();
-        
-        public Track() { }
-        public Track(string name, int lapCount)
-        {
-            Name = name;
-            RequiredLapCount = lapCount;
-        }
-
-        public double TotalDistance()
-        {
-            double distance = Length * RequiredLapCount;
-            return distance;
-        }
     }
 }

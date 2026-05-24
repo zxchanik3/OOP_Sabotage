@@ -1,5 +1,3 @@
-using System;
-
 namespace lab
 {
     public enum TyreType
@@ -13,7 +11,6 @@ namespace lab
     {
         public TyreType Type { get; private set; }
 
-        // Çáåð³ãàºìî ì³öí³ñòü ÿê float äëÿ òî÷íîãî ðîçðàõóíêó çíîñó ÷åðåç dT
         private float preciseDurability = 100f;
         public int Durability => (int)Math.Ceiling(preciseDurability);
 
