@@ -1,8 +1,5 @@
 ﻿using lab;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Numerics;
 using System.Text.Json;
 using System.Windows;
@@ -17,12 +14,11 @@ namespace RaceGUI
 {
     public partial class MainWindow : Window
     {
-        // ================= DATA =================
         private GameData _gameData = new();
         private readonly string _dataFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
 
         private List<Car> _cars = new();
-        private Dictionary<Car, Image> _carVisuals = new(); // Колега замінив Rectangle на Image!
+        private Dictionary<Car, Image> _carVisuals = new(); // Візуалізація через картинки від колеги
 
         private List<Car> _carOptions = new();
         private int _carIndex = 0;
@@ -35,11 +31,13 @@ namespace RaceGUI
 
         private DispatcherTimer _timer = new();
 
-        // ================= STATE =================
         private bool _isRaceFinished;
         private int _selectedLaps = 5;
         private string _selectedTrackName = "GP";
-        private bool _trackHasPitStop = true; // Твоя змінна для піт-стопу
+        private Dictionary<Car, int> _carLaps = new();
+        private Dictionary<Car, int> _carLastWaypoint = new();
+        private bool _trackHasPitStop = true;
+        private float _raceTime = 0f;
 
         private Rect _pitArea = new Rect(350, 470, 170, 50);
         private DispatcherTimer _pitTimer = new();
@@ -53,7 +51,6 @@ namespace RaceGUI
 
         private List<Ellipse> _dustParticles = new(); // Твої частинки пилу
 
-        // ================= INIT =================
         public MainWindow()
         {
             InitializeComponent();
@@ -69,17 +66,18 @@ namespace RaceGUI
 
         private void InitializeGame()
         {
-            // Завантаження Гаража від колеги
             Directory.CreateDirectory(_dataFolder);
             _gameData.AddCar(new CarConfig("Car1", "Blue", 2020, 670, 3, 250, 780, "Images/car1.png"));
             _gameData.AddCar(new CarConfig("Car2", "Green", 2021, 720, 2, 260, 750, "Images/car2.png"));
-            
+            _gameData.AddCar(new CarConfig("Car3", "Purple", 2019, 650, 4, 240, 800, "Images/car3.png"));
+            _gameData.AddCar(new CarConfig("Car4", "Yellow", 2022, 700, 3.5f, 255, 770, "Images/car4.png"));
+            _gameData.AddCar(new CarConfig("Car5", "Red", 2023, 750, 2.5f, 270, 730, "Images/car5.png"));
+
             _gameData.AddDriver(new DriverConfig("Player", 77, false));
             _gameData.AddDriver(new DriverConfig("Lewis", 11, true));
 
             _gameData.CarSaveToFile(System.IO.Path.Combine(_dataFolder, "CarsData.json")); 
             _gameData.DriverSaveToFile(System.IO.Path.Combine(_dataFolder, "DriversData.json"));
-
             _gameData.CarLoadFromFile(System.IO.Path.Combine(_dataFolder, "CarsData.json"));
             
             _carOptions = _gameData.Cars
@@ -87,8 +85,6 @@ namespace RaceGUI
                 .ToList();
 
             _selectedCarTemplate = _carOptions.FirstOrDefault();
-
-            // Твій старт з пустими координатами (карта завантажиться з JSON пізніше)
             _trackNodes = new List<TrackNode>();
         }
 
@@ -99,8 +95,8 @@ namespace RaceGUI
                 string basePath = AppDomain.CurrentDomain.BaseDirectory;
                 _menuMusicPlayer.Open(new Uri(System.IO.Path.Combine(basePath, "Music", "MenuSong.mp3")));
                 _raceMusicPlayer.Open(new Uri(System.IO.Path.Combine(basePath, "Music", "RaceSong.mp3")));
-                _menuMusicPlayer.Volume = 0.02;
-                _raceMusicPlayer.Volume = 0.02;
+                _menuMusicPlayer.Volume = 0.2;
+                _raceMusicPlayer.Volume = 0.2;
                 _menuMusicPlayer.MediaEnded += (s, e) => _menuMusicPlayer.Position = TimeSpan.Zero;
                 _raceMusicPlayer.MediaEnded += (s, e) => _raceMusicPlayer.Position = TimeSpan.Zero;
                 _menuMusicPlayer.Play();
@@ -108,18 +104,23 @@ namespace RaceGUI
             catch { }
         }
 
-        // ================= LOOP =================
+        // ================= ІГРОВИЙ ЦИКЛ =================
         private void Timer_Tick(object? sender, EventArgs e)
         {
             if (_cars.Count == 0 || _isRaceFinished) return;
 
             var car = _cars[0];
-            var input = _userDriver.GetInput(car, 0.16f);
             
-            // Оновлюємо фізику
-            car.Update(input, 0.16f, new StraightSegment(100));
-
-            // ТВІЙ КОД: М'які межі екрану
+            var input = _userDriver.GetInput(car, 0.07f);
+            car.Update(input, 0.07f, new StraightSegment(100));
+            
+            if (!_isRaceFinished)
+            {
+                _raceTime += 0.016f;
+                TimeSpan ts = TimeSpan.FromSeconds(_raceTime);
+                TxtTimer.Text = $"Час: {ts.ToString(@"mm\:ss\.ff")}";
+            }
+            
             float padding = 15f;
             float clampedX = Math.Max(padding, Math.Min(car.Position.X, (float)GameCanvas.ActualWidth - padding));
             float clampedY = Math.Max(padding, Math.Min(car.Position.Y, (float)GameCanvas.ActualHeight - padding));
@@ -128,13 +129,72 @@ namespace RaceGUI
                 car.SetPosition(new Vector2(clampedX, clampedY), car.Direction);
             }
 
-            // ТВІЙ КОД: Піт-стоп тільки там, де він є
+            int closestNodeIndex = GetClosestNodeIndex(car.Position);
+
+            if (closestNodeIndex >= 0)
+            {
+                if (!_carLaps.ContainsKey(car))
+                {
+                    _carLaps[car] = 1;
+                    _carLastWaypoint[car] = 0;
+                }
+
+                int lastWp = _carLastWaypoint[car];
+
+                if (closestNodeIndex > lastWp && closestNodeIndex <= lastWp + 5)
+                {
+                    _carLastWaypoint[car] = closestNodeIndex;
+                }
+                else if (lastWp >= _trackNodes.Count - 5 && closestNodeIndex <= 5)
+                {
+                    _carLaps[car]++;
+                    _carLastWaypoint[car] = closestNodeIndex;
+
+                    if (_carLaps[car] > _track.RequiredLapCount)
+                    {
+                        _isRaceFinished = true;
+                        _timer.Stop();
+
+                        TxtStatus.Text = "ФІНІШ!";
+                        TxtResultPlace.Text = "Місце: 1";
+
+                        TimeSpan ts = TimeSpan.FromSeconds(_raceTime);
+                        TxtResultTime.Text = $"Час: {ts.ToString(@"mm\:ss\.ff")}";
+
+                        ResultMenuPanel.Visibility = Visibility.Visible;
+                        return;
+                    }
+                }
+            }
+
+            if (closestNodeIndex >= 0)
+            {
+                Vector2 closestNodePos = _trackNodes[closestNodeIndex].Position;
+                float distToTrack = Vector2.Distance(car.Position, closestNodePos);
+
+                if (distToTrack > 45f) 
+                {
+                    if (car.Speed > 30f)
+                    {
+                        SpawnDust(car.Position);
+                    }
+                    car.Speed *= 0.94f;
+                }
+
+                if (distToTrack > 55f)
+                {
+                    Vector2 pushDir = Vector2.Normalize(closestNodePos - car.Position);
+                    car.SetPosition(car.Position + pushDir * 3f, car.Direction);
+                }
+            }
+
+            // Логіка автоматичного піт-стопу
             if (_trackHasPitStop)
             {
-                Point carPoint = new System.Windows.Point(car.Position.X, car.Position.Y);
+                Point carPoint = new Point(car.Position.X, car.Position.Y);
                 if (_pitArea.Contains(carPoint))
                 {
-                    if (_autoPitLimiter && car.Speed > 40f) // Ліміт піт-лейну
+                    if (_autoPitLimiter && car.Speed > 40f)
                     {
                         car.Speed -= 2f; 
                     }
@@ -154,18 +214,11 @@ namespace RaceGUI
             }
             else
             {
-                // Відновлення шин, якщо піт-стопу немає
                 if (car.Tyres != null && car.Tyres.Durability < 100)
                     car.ChangeTyres(car.Tyres.Type);
             }
 
-            // ТВІЙ КОД: Пил при вильоті на узбіччя
-            if (car.Speed > 30f && GetClosestNodeDistance(car.Position) > 45f) 
-            {
-                SpawnDust(car.Position);
-            }
-
-            // Анімація розсіювання пилу
+            // Оновлення частинок пилу
             for (int i = _dustParticles.Count - 1; i >= 0; i--)
             {
                 Ellipse p = _dustParticles[i];
@@ -184,21 +237,27 @@ namespace RaceGUI
 
             UpdateCarVisual(car);
             
-            // Оновлення HUD
             string tyreText = _trackHasPitStop ? $"{(int)car.Tyres.Durability}%" : "—";
-            TxtStatus.Text = $"Швидкість: {(int)car.Speed} км/год | Шини: {tyreText}";
+            int currentLap = _carLaps.ContainsKey(car) ? _carLaps[car] : 1;
+            TxtStatus.Text = $"Коло: {currentLap}/{_track.RequiredLapCount} | Швидкість: {Math.Abs((int)car.Speed)} км/год | Шини: {tyreText}";
         }
 
-        private float GetClosestNodeDistance(Vector2 pos)
+        private int GetClosestNodeIndex(Vector2 pos)
         {
-            if (_trackNodes.Count == 0) return 0f;
+            if (_trackNodes.Count == 0) return -1;
+            int best = 0;
             float bestDist = float.MaxValue;
-            foreach (var node in _trackNodes)
+            
+            for (int i = 0; i < _trackNodes.Count; i++)
             {
-                float d = Vector2.Distance(pos, node.Position);
-                if (d < bestDist) bestDist = d;
+                float d = Vector2.Distance(pos, _trackNodes[i].Position);
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    best = i;
+                }
             }
-            return bestDist;
+            return best;
         }
 
         private void PitTimer_Tick(object? sender, EventArgs e)
@@ -214,6 +273,7 @@ namespace RaceGUI
             }
         }
 
+        // ВИПРАВЛЕНО: Машинка тепер крутиться ІДЕАЛЬНО навколо своєї осі (прибрано подвійний центр)
         private void UpdateCarVisual(Car car)
         {
             if (!_carVisuals.TryGetValue(car, out var img)) return;
@@ -222,7 +282,7 @@ namespace RaceGUI
             Canvas.SetTop(img, car.Position.Y - img.Height / 2);
 
             double angle = Math.Atan2(car.Direction.Y, car.Direction.X) * 180 / Math.PI;
-            img.RenderTransform = new RotateTransform(angle, img.Width / 2, img.Height / 2);
+            img.RenderTransform = new RotateTransform(angle); 
         }
 
         private void SpawnDust(Vector2 position)
@@ -239,9 +299,9 @@ namespace RaceGUI
             _dustParticles.Add(dust);
         }
 
-        // ================= MENUS & BUTTONS =================
-
-        private void StartGameOnMap(string mapType)
+        // ================= ЗАВАНТАЖЕННЯ ТА СТАРТ ГОНКИ =================
+        // ПОВЕРНУТО: Метод став async для підтримки красивого зворотного відліку 3...2...1
+        private async void StartGameOnMap(string mapType)
         {
             _selectedTrackName = mapType;
             _trackHasPitStop = (_selectedTrackName == "Winter");
@@ -250,7 +310,7 @@ namespace RaceGUI
             string uriPath = _selectedTrackName == "Winter" ? "/Images/WinterMap.jpg" : "/Images/ForestMap.jpg";
             GameCanvas.Background = new ImageBrush { ImageSource = new BitmapImage(new Uri($"pack://application:,,,{uriPath}")), Stretch = Stretch.Fill };
 
-            // ТВІЙ КОД: Завантаження траси з JSON
+            // Завантаження точок з вашого JSON файлу
             string filePath = $"{mapType}.json";
             if (File.Exists(filePath))
             {
@@ -289,9 +349,19 @@ namespace RaceGUI
                 _raceMusicPlayer.Play();
             }
 
-            SpawnCar(); // Спавнимо обрану в Гаражі машину
+            SpawnCar(); 
             ResetGameState();
-            _timer.Start();
+
+            // ПОВЕРНУТО: Логіка зворотного відліку перед стартом гонки!
+            _timer.Stop(); 
+            for (int i = 3; i > 0; i--)
+            {
+                TxtStatus.Text = $"СТАРТ ЧЕРЕЗ: {i}";
+                await Task.Delay(1000); 
+            }
+            TxtStatus.Text = "СТАРТ!";
+            _raceTime = 0f;
+            _timer.Start(); 
         }
 
         private void SpawnCar()
@@ -309,7 +379,6 @@ namespace RaceGUI
             _carVisuals.Clear();
             _cars.Add(car);
 
-            // КОЛЕГА: Відображення машини через картинку
             var img = new Image { Width = 40, Height = 20, RenderTransformOrigin = new Point(0.5, 0.5) };
             try
             {
@@ -326,10 +395,10 @@ namespace RaceGUI
         private void ResetGameState()
         {
             if (_cars.Count == 0 || _trackNodes.Count < 2) return;
-            
             _isRaceFinished = false;
             var car = _cars[0];
             car.Speed = 0f;
+            _carLastWaypoint[car] = 0;
             car.ChangeTyres(TyreType.Medium); 
             
             Vector2 startPos = _trackNodes[0].Position;
@@ -339,11 +408,14 @@ namespace RaceGUI
             _isPitServing = false;
             TxtPitStatus.Visibility = Visibility.Collapsed;
 
-            // Миттєве оновлення візуалу
             UpdateCarVisual(car);
+            
+            _raceTime = 0f;
+            TxtTimer.Text = "Час: 00:00.00";
+            ResultMenuPanel.Visibility = Visibility.Collapsed;
         }
 
-        // ================= BUTTON HANDLERS =================
+        // ================= КНОПКИ ТА ОБРОБНИКИ =================
         private void BtnPlayGame_Click(object sender, RoutedEventArgs e)
         {
             BtnPlayGame.Visibility = Visibility.Collapsed;
@@ -368,7 +440,6 @@ namespace RaceGUI
             PauseMenuPanel.Visibility = Visibility.Collapsed;
             ResetGameState();
             _timer.Start();
-            TxtStatus.Text = "Гонка активована!";
         }
 
         private void BtnMainMenu_Click(object sender, RoutedEventArgs e)
@@ -383,7 +454,6 @@ namespace RaceGUI
             _menuMusicPlayer.Play();
         }
 
-        // ================= GARAGE HANDLERS (КОЛЕГА) =================
         private void BtnCarGarage_Click(object sender, RoutedEventArgs e)
         {
             CarGaragePanel.Visibility = Visibility.Visible;
@@ -423,10 +493,10 @@ namespace RaceGUI
             }
         }
 
-        // ================= INPUT =================
+        // ================= КЕРУВАННЯ =================
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            // ТВІЙ КОД: Пауза на Esc
+            // ПОВЕРНУТО: Пауза на клавішу Escape
             if (e.Key == Key.Escape)
             {
                 if (_timer.IsEnabled)
@@ -465,11 +535,17 @@ namespace RaceGUI
                 case Key.D: case Key.Right: _userDriver.Release(lab.Button.Right); break;
             }
         }
-
-        private void GameCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+        
+        private void BtnResultMainMenu_Click(object sender, RoutedEventArgs e)
         {
-            var p = e.GetPosition(GameCanvas);
-            Console.WriteLine($"new Vector2({(int)p.X}, {(int)p.Y}),");
+            ResultMenuPanel.Visibility = Visibility.Collapsed;
+            _timer.Stop();
+            ResetGameState();
+            GameScreenGrid.Visibility = Visibility.Collapsed;
+            MainMenuGrid.Visibility = Visibility.Visible;
+            BtnPlayGame.Visibility = Visibility.Visible;
+            _raceMusicPlayer.Stop();
+            _menuMusicPlayer.Play();
         }
     }
 }
