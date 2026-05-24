@@ -31,12 +31,11 @@ namespace RaceGUI
         private readonly List<Vector2> _pitRoute = new();
         private readonly DispatcherTimer _timer = new();
 
-        private int _selectedLaps = 5;
+        private int _selectedLaps = 3;
         private string _selectedTrackName = "GP";
         private bool _trackHasPitStop = true;
         private bool _autoPitLimiter = true;
 
-        // Нові менеджери логіки
         private readonly AudioManager _audioManager = new();
         private readonly RaceEngine _raceEngine = new();
         private readonly PitStopManager _pitStopManager = new();
@@ -53,7 +52,6 @@ namespace RaceGUI
             _timer.Interval = TimeSpan.FromMilliseconds(16);
             _timer.Tick += Timer_Tick;
 
-            // Підписка на події піт-стопу
             _pitStopManager.PitTick += (_) => TxtPitStatus.Visibility = Visibility.Visible;
             _pitStopManager.PitCompleted += () =>
             {
@@ -65,11 +63,11 @@ namespace RaceGUI
         private void InitializeGame()
         {
             Directory.CreateDirectory(_dataFolder);
-            _gameData.AddCar(new CarConfig("Car1", "Blue", 2020, 670, 3, 250, 780, "Images/car1.png"));
-            _gameData.AddCar(new CarConfig("Car2", "Green", 2021, 720, 2, 260, 750, "Images/car2.png"));
-            _gameData.AddCar(new CarConfig("Car3", "Purple", 2019, 650, 4, 240, 800, "Images/car3.png"));
-            _gameData.AddCar(new CarConfig("Car4", "Red", 2022, 700, 3.5f, 255, 770, "Images/car4.png"));
-            _gameData.AddCar(new CarConfig("Car5", "DarkBlue", 2023, 750, 2.5f, 270, 730, "Images/car5.png"));
+            _gameData.AddCar(new CarConfig("Car1", "Blue", 2020, 670, 3, 265, 780, "Images/car1.png"));
+            _gameData.AddCar(new CarConfig("Car2", "Green", 2021, 720, 2, 280, 750, "Images/car2.png"));
+            _gameData.AddCar(new CarConfig("Car3", "Purple", 2019, 650, 4, 260, 800, "Images/car3.png"));
+            _gameData.AddCar(new CarConfig("Car4", "Red", 2022, 700, 3.5f, 270, 770, "Images/car4.png"));
+            _gameData.AddCar(new CarConfig("Car5", "DarkBlue", 2023, 750, 2.5f, 285, 730, "Images/car5.png"));
 
             _gameData.CarSaveToFile(Path.Combine(_dataFolder, "CarsData.json")); 
             _gameData.CarLoadFromFile(Path.Combine(_dataFolder, "CarsData.json"));
@@ -90,7 +88,15 @@ namespace RaceGUI
                 var car = _cars[i];
                 CarInput input = new CarInput();
 
-                if (i == 0) input = _userDriver.GetInput(car, 0.07f);
+                if (_raceEngine.IsCarFinished(car))
+                {
+                    car.Speed *= 0.88f;
+                    if (MathF.Abs(car.Speed) < 1f) car.Speed = 0f;
+                    car.Update(new CarInput(), 0.07f);
+                    UpdateCarVisual(car);
+                    continue;
+                }
+                else if (i == 0) input = _userDriver.GetInput(car, 0.07f);
                 else if (i == 1 && _botDumb != null) input = _botDumb.GetInput(car, 0.07f);
                 else if (i == 2 && _botSmart != null) input = _botSmart.GetInput(car, 0.07f);
 
@@ -112,7 +118,8 @@ namespace RaceGUI
                     {
                         _timer.Stop();
                         TxtStatus.Text = "ФІНІШ!";
-                        TxtResultPlace.Text = "Місце: 1"; 
+                        int place = _raceEngine.FinishOrder.IndexOf(car) + 1;
+                        TxtResultPlace.Text = $"Місце: {place}";
                         TimeSpan ts = TimeSpan.FromSeconds(_raceEngine.RaceTime);
                         TxtResultTime.Text = $"Час: {ts:mm\\:ss\\.ff}";
                         ResultMenuPanel.Visibility = Visibility.Visible;
@@ -151,7 +158,7 @@ namespace RaceGUI
 
             if (!_raceEngine.IsRaceFinished && _cars.Count > 0)
             {
-                _raceEngine.UpdateTime(0.016f);
+                _raceEngine.UpdateTime(0.025f);
                 TimeSpan ts = TimeSpan.FromSeconds(_raceEngine.RaceTime);
                 TxtTimer.Text = $"Час: {ts:mm\\:ss\\.ff}";
                 
@@ -250,8 +257,8 @@ namespace RaceGUI
             if (pCfg == null) return;
 
             var playerCar = new Car(pCfg.Model, pCfg.Team, pCfg.Year, pCfg.Horsepower, pCfg.Acceleration, pCfg.TopSpeed, pCfg.Weight, pCfg.ImagePath);
-            var dumbCar = new Car("Bot1", "AI", 2020, 680, 4, 265, 790, "Images/car6.png");
-            var smartCar = new Car("Bot2", "AI", 2021, 710, 3, 265, 760, "Images/car7.png");
+            var dumbCar = new Car("Bot1", "AI", 2020, 680, 3, 290, 790, "Images/car6.png");
+            var smartCar = new Car("Bot2", "AI", 2021, 710, 3, 290, 760, "Images/car7.png");
 
             _cars.Clear();
             _cars.Add(playerCar);
@@ -283,8 +290,17 @@ namespace RaceGUI
             ResultMenuPanel.Visibility = Visibility.Collapsed;
 
             var mainRoute = _trackNodes.Select(n => n.Position).ToList();
+
             _botDumb = new NpcDriver("Dumb", 6, new DumbStrategy(mainRoute));
-            _botSmart = new NpcDriver("Smart", 7, new SmartStrategy(mainRoute, _pitRoute));
+
+            if (_selectedTrackName == "Forest")
+            {
+                _botSmart = new NpcDriver("Smart", 7, new DumbStrategy(mainRoute));
+            }
+            else
+            {
+                _botSmart = new NpcDriver("Smart", 7, new SmartStrategy(mainRoute, _pitRoute));
+            }
 
             Vector2 startPos = _trackNodes[0].Position;
             Vector2 startDir = Vector2.Normalize(_trackNodes[1].Position - _trackNodes[0].Position);
