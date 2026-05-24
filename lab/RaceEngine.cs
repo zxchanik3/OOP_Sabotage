@@ -7,6 +7,9 @@ namespace lab
 
         public Dictionary<Car, int> CarLaps { get; } = new();
         public Dictionary<Car, int> CarLastWaypoint { get; } = new();
+        public Dictionary<Car, bool> FinishedCars = new Dictionary<Car, bool>();
+
+        public List<Car> FinishOrder { get; } = new();
 
         public void UpdateTime(float deltaTime)
         {
@@ -22,6 +25,9 @@ namespace lab
         public bool CheckLapAndCheckpoints(Car car, int carIndex, int closestNodeIndex, int totalNodes, int requiredLaps)
         {
             if (!CarLaps.ContainsKey(car)) RegisterCarInRace(car);
+
+            if (IsCarFinished(car)) return false;
+
             int lastWp = CarLastWaypoint[car];
 
             if (closestNodeIndex > lastWp && closestNodeIndex <= lastWp + 5)
@@ -33,13 +39,29 @@ namespace lab
                 CarLaps[car]++;
                 CarLastWaypoint[car] = closestNodeIndex;
 
-                if (carIndex == 0 && CarLaps[car] > requiredLaps)
+                if (CarLaps[car] > requiredLaps)
                 {
-                    IsRaceFinished = true;
-                    return true; // Повертаємо true, якщо гравець завершив гонку
+                    MarkAsFinished(car);
+                    FinishOrder.Add(car);
+
+                    if (carIndex == 0)
+                    {
+                        IsRaceFinished = true;
+                        return true;
+                    }
                 }
             }
             return false;
+        }
+        
+        public bool IsCarFinished(Car car) 
+        {
+            return FinishedCars.ContainsKey(car);
+        }
+
+        public void MarkAsFinished(Car car) 
+        {
+            if (!FinishedCars.ContainsKey(car)) FinishedCars.Add(car, true);
         }
 
         public void Reset()
@@ -48,6 +70,8 @@ namespace lab
             IsRaceFinished = false;
             CarLaps.Clear();
             CarLastWaypoint.Clear();
+            FinishedCars.Clear();
+            FinishOrder.Clear();
         }
     }
 }

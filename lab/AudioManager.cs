@@ -15,8 +15,8 @@ namespace lab
                 _menuMusic.Open(new Uri(Path.Combine(basePath, "Music", "MenuSong.mp3")));
                 _raceMusic.Open(new Uri(Path.Combine(basePath, "Music", "RaceSong.mp3")));
                 
-                _menuMusic.Volume = 0.2;
-                _raceMusic.Volume = 0.2;
+                _menuMusic.Volume = 0.1;
+                _raceMusic.Volume = 0.1;
                 
                 _menuMusic.MediaEnded += (_, _) => _menuMusic.Position = TimeSpan.Zero;
                 _raceMusic.MediaEnded += (_, _) => _raceMusic.Position = TimeSpan.Zero;

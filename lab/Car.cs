@@ -81,9 +81,8 @@ namespace lab
 
             float gripFactor = Tyres.GripLevel / 100f;
 
-            // ТВОЯ ФІЗИКА: Машина повертає швидше і краще тримає керування
             float baseAngularVelocity = 150f;
-            float speedSensitivityFactor = 1f / (1f + absoluteSpeed / 800f);
+            float speedSensitivityFactor = 1f / (1f + absoluteSpeed / 600f);
 
             float effectiveAngularVelocity = baseAngularVelocity * gripFactor * speedSensitivityFactor;
             float angleChange = effectiveAngularVelocity * turnInput * dT;
