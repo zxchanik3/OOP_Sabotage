@@ -3,8 +3,8 @@ namespace lab;
 public class TrackData
 {
     public string TrackName { get; set; }
-    public System.Collections.Generic.List<NodePoint> Nodes { get; set; }
-    public System.Collections.Generic.List<SegmentData> Segments { get; set; }
+    public List<NodePoint> Nodes { get; set; }
+    public List<SegmentData> Segments { get; set; }
 }
 
 public class NodePoint

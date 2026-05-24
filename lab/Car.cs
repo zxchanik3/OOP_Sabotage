@@ -4,29 +4,26 @@ namespace lab
 {
     public class Car
     {
-        public string Model { get; set; } = "Unknown";
-        public string Team { get; set; } = "Independent";
+        public string Model { get; set; }
+        public string Team { get; set; }
         public int Year { get; set; }
         public int Horsepower { get; set; }
-        public int Acceleration { get; set; } // Твій тип даних
+        public int Acceleration { get; set; }
         public int TopSpeed { get; set; }
         public int Weight { get; set; }
         
-        // ФІЧА КОЛЕГИ: Шлях до картинки для Гаража
-        public string ImagePath { get; set; } = ""; 
+        public string ImagePath { get; set; }
 
         public float SpeedScale { get; set; } = 0.4f;
 
-        // ТВІЙ КОД: Speed має { get; set; } для роботи рестарту гри
-        public float Speed { get; set; } = 0f; 
+        public float Speed { get; set; }
         
         public Vector2 Position { get; private set; } = new Vector2(0, 0);
         public Vector2 Direction { get; private set; } = new Vector2(1, 0);
-        private float AngularVelocity { get; set; } = 90f;
+
         public Tyre Tyres { get; private set; }
         public float MaxReverseSpeed { get; set; } = 40f;
 
-        // ОНОВЛЕНИЙ КОНСТРУКТОР: Твої типи даних + ImagePath від колеги
         public Car(string model, string team, int year, int horsepower, int acceleration, int topSpeed, int weight, string imagePath = "")
         {
             Model = model;
@@ -45,10 +42,8 @@ namespace lab
             Tyres = new Tyre(type);
         }
 
-        public void UpdateSpeed(float accelInput, float dT, TrackSegment currentSegment)
+        public void UpdateSpeed(float accelInput, float dT)
         {
-            if (Tyres == null) return;
-
             float gripFactor = Tyres.GripLevel / 100f;
 
             float currentAccel = Acceleration * gripFactor * 10f;
@@ -82,13 +77,13 @@ namespace lab
         public void UpdateDirection(float dT, float turnInput)
         {
             float absoluteSpeed = MathF.Abs(Speed);
-            if (Tyres == null || turnInput == 0 || absoluteSpeed < 0.1f) return;
+            if (turnInput == 0 || absoluteSpeed < 0.1f) return;
 
             float gripFactor = Tyres.GripLevel / 100f;
 
             // ТВОЯ ФІЗИКА: Машина повертає швидше і краще тримає керування
             float baseAngularVelocity = 150f;
-            float speedSensitivityFactor = 1f / (1f + absoluteSpeed / 1000f);
+            float speedSensitivityFactor = 1f / (1f + absoluteSpeed / 800f);
 
             float effectiveAngularVelocity = baseAngularVelocity * gripFactor * speedSensitivityFactor;
             float angleChange = effectiveAngularVelocity * turnInput * dT;
@@ -113,17 +108,17 @@ namespace lab
             Direction = startDirection;
         }
 
-        public void Update(CarInput input, float dT, TrackSegment segment)
+        public void Update(CarInput input, float dT)
         {
             UpdateDirection(dT, input.Steering);
 
             float accel = input.Throttle - input.Brake;
 
-            UpdateSpeed(accel, dT, segment);
+            UpdateSpeed(accel, dT);
 
             Position += Direction * (Speed * SpeedScale) * dT;
 
-            if (Tyres != null && MathF.Abs(Speed) > 10f)
+            if (MathF.Abs(Speed) > 10f)
                 Tyres.WearDown(MathF.Abs(Speed), dT);
         }
     }

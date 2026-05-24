@@ -1,15 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
 
 namespace lab
 {
-    // =======================================================
-    // КЛАСИ КОНФІГУРАЦІЙ (Від колеги - можливо потрібні для Гаража)
-    // =======================================================
     public class CarConfig
     {
         public string Model { get; set; } = "";
@@ -77,7 +69,6 @@ namespace lab
 
     public class GameData
     {
-        // ОНОВЛЕНО: Тепер списки зберігають Config-шаблони
         public List<DriverConfig> Drivers { get; private set; } = new();
         public List<CarConfig> Cars { get; private set; } = new();
         public List<TrackConfig> Tracks { get; private set; } = new();

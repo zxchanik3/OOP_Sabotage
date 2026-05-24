@@ -1,5 +1,3 @@
-using System;
-
 namespace lab
 {
     public class Driver
@@ -22,18 +20,6 @@ namespace lab
             Name = name;
             Number = number;
             Lock = lockStatus;
-        }
-
-        public void SetTeam(string team)
-        {
-            Team = team;
-        }
-
-        public void AddRaceResult()
-        {
-            if (Position == 1) Wins++;
-            if (Position <= 3) Podiums++;
-            Races++;
         }
 
         public virtual CarInput GetInput(Car car, float dT)
