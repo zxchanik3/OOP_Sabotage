@@ -73,9 +73,7 @@ namespace lab
         public List<CarConfig> Cars { get; private set; } = new();
         public List<TrackConfig> Tracks { get; private set; } = new();
 
-        public GameData()
-        {
-        }
+        public GameData() { }
 
         #region Drivers
 
