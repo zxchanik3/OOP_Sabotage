@@ -94,11 +94,12 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#2C3E50">
-                <TextBlock Name="TxtStatus" Text="Статус: Очікування" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0" FontSize="16"/>
-            </StackPanel>
+            <Grid Grid.Row="0" Background="#2C3E50">
+                <TextBlock Name="TxtTimer" Text="Час: 00:00.00" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0" FontSize="18" FontWeight="Bold"/>
+                <TextBlock Name="TxtStatus" Text="Статус: Очікування" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="20" FontWeight="Bold"/>
+            </Grid>
 
-            <Canvas Name="GameCanvas" Grid.Row="1" MouseDown="GameCanvas_MouseDown">
+            <Canvas Name="GameCanvas" Grid.Row="1">
                 <Canvas.Background>
                     <ImageBrush ImageSource="/Images/WinterMap.jpg" Stretch="Fill"/>
                 </Canvas.Background>
@@ -122,6 +123,28 @@
                         </Button>
 
                         <Button Name="BtnMainMenu" Content="Головне меню" Width="260" Height="45" Background="#E0E0E0" FontWeight="Bold" FontSize="18" Click="BtnMainMenu_Click">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="20"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Border>
+            
+            <Border Name="ResultMenuPanel" Visibility="Collapsed" Background="#80000000" Grid.Row="1" Panel.ZIndex="102">
+                <Border Background="#9E9E9E" Width="455" Height="320" CornerRadius="15" BorderBrush="#555555" BorderThickness="4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                        <Border Background="#D32F2F" CornerRadius="15" Width="200" Height="45" Margin="0,0,0,25" BorderBrush="#555555" BorderThickness="2">
+                            <TextBlock Text="РЕЗУЛЬТАТИ" Foreground="White" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+
+                        <TextBlock Name="TxtResultPlace" Text="Місце: 1" Foreground="#2C3E50" FontWeight="Bold" FontSize="22" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                        <TextBlock Name="TxtResultTime" Text="Час: 00:00.00" Foreground="#2C3E50" FontWeight="Bold" FontSize="22" Margin="0,0,0,30" HorizontalAlignment="Center"/>
+
+                        <Button Name="BtnResultMainMenu" Content="Головне меню" Width="260" Height="45" Background="#E0E0E0" FontWeight="Bold" FontSize="18" Click="BtnResultMainMenu_Click">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="20"/>
