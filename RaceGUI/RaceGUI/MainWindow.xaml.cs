@@ -33,7 +33,7 @@ namespace RaceGUI
         private NpcDriver _botDumb;
         private NpcDriver _botSmart;
 
-        private Track _track = new TrackBuilder().SetName("GP").SetLaps(5).Build();
+        private Track _track = new Track { Name = "GP", RequiredLapCount = 5 };
         private List<TrackNode> _trackNodes = new();
         private DispatcherTimer _timer = new();
         private List<Vector2> _pitRoute = new();
